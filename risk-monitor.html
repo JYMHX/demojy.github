@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>风险监控 - 客户信用管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="credit-rating.css">
+    <link rel="stylesheet" href="components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* 风险监控页面特定样式 */
+        .risk-summary-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .risk-summary-card {
+            background-color: white;
+            border-radius: var(--radius-md);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .risk-card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .risk-card-icon.yellow {
+            background-color: var(--warning-yellow);
+        }
+        
+        .risk-card-icon.orange {
+            background-color: #FF9500;
+        }
+        
+        .risk-card-icon.red {
+            background-color: var(--danger-red);
+        }
+        
+        .risk-card-icon.black {
+            background-color: #000000;
+        }
+        
+        .risk-card-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        
+        .risk-card-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .risk-card-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        
+        .risk-alert-list {
+            margin-top: 20px;
+        }
+        
+        .risk-alert-item {
+            background-color: white;
+            border-radius: var(--radius-md);
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .risk-alert-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .risk-alert-content {
+            flex: 1;
+        }
+        
+        .risk-alert-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .risk-alert-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .risk-alert-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+        
+        .risk-alert-details {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+        }
+        
+        .risk-alert-detail {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .risk-alert-detail-label {
+            color: var(--text-secondary);
+        }
+        
+        .risk-alert-detail-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .risk-alert-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .risk-filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 15px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .risk-filter-label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .risk-filter-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .risk-filter-option {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: #f5f5f5;
+            color: var(--text-secondary);
+        }
+        
+        .risk-filter-option:hover {
+            background-color: #e9e9e9;
+        }
+        
+        .risk-filter-option.active {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .risk-filter-option.yellow {
+            background-color: rgba(255, 204, 0, 0.2);
+            color: #997a00;
+        }
+        
+        .risk-filter-option.yellow.active {
+            background-color: var(--warning-yellow);
+            color: white;
+        }
+        
+        .risk-filter-option.orange {
+            background-color: rgba(255, 149, 0, 0.2);
+            color: #996900;
+        }
+        
+        .risk-filter-option.orange.active {
+            background-color: #FF9500;
+            color: white;
+        }
+        
+        .risk-filter-option.red {
+            background-color: rgba(255, 59, 48, 0.2);
+            color: #992720;
+        }
+        
+        .risk-filter-option.red.active {
+            background-color: var(--danger-red);
+            color: white;
+        }
+        
+        .risk-filter-option.black {
+            background-color: rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+        
+        .risk-filter-option.black.active {
+            background-color: #000;
+            color: white;
+        }
+        
+        /* 通知样式 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 16px;
+            border-radius: 4px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+        
+        .notification.info {
+            background-color: var(--primary-blue);
+        }
+        
+        .notification.success {
+            background-color: var(--success-green);
+        }
+        
+        .notification.error {
+            background-color: var(--danger-red);
+        }
+        
+        .notification.warning {
+            background-color: var(--warning-yellow);
+        }
+        
+        .notification i {
+            font-size: 18px;
+        }
+        
+        /* 加载中动画 */
+        .btn-loading {
+            position: relative;
+            color: transparent !important;
+        }
+        
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 16px;
+            height: 16px;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .risk-summary-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .risk-summary-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .risk-filter-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .risk-filter-options {
+                width: 100%;
+            }
+        }
+
+        /* 风险分析模态框样式 */
+        .customer-profile {
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .profile-header h3 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .profile-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .profile-stat {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .risk-analysis-tabs {
+            margin-top: 20px;
+        }
+
+        .tab-headers {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            position: relative;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .tab.active {
+            color: var(--primary-blue);
+        }
+
+        .tab.active:after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--primary-blue);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .risk-factors-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .risk-factor {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .risk-factor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .risk-factor-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .risk-factor-score {
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .risk-factor-score.danger {
+            background-color: rgba(255, 59, 48, 0.1);
+            color: #ff3b30;
+        }
+
+        .risk-factor-score.warning {
+            background-color: rgba(255, 204, 0, 0.1);
+            color: #997a00;
+        }
+
+        .risk-factor-score.success {
+            background-color: rgba(76, 217, 100, 0.1);
+            color: #4cd964;
+        }
+
+        .risk-factor-body {
+            padding: 15px;
+        }
+
+        .risk-factor-body p {
+            margin: 0 0 10px 0;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .risk-detail-list {
+            margin: 0;
+            padding: 0 0 0 18px;
+            list-style-type: disc;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .risk-detail-list li {
+            margin-bottom: 5px;
+        }
+
+        .text-danger {
+            color: #ff3b30;
+        }
+
+        .risk-score-summary {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        .total-score-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 20px;
+            margin-right: 20px;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .total-score-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .total-score {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ff3b30;
+            line-height: 1;
+        }
+
+        .total-score-max {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .score-analysis {
+            flex: 1;
+        }
+
+        .score-analysis p {
+            margin: 0 0 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .risk-level-d {
+            font-weight: 600;
+            color: #ff3b30;
+        }
+
+        .payment-history-chart-container, 
+        .risk-trend-chart-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        .payment-history-table h4,
+        .risk-trend-summary h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .risk-trend-details {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .trend-detail {
+            background-color: white;
+            border-radius: 6px;
+            padding: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .trend-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .trend-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+        }
+
+        .trend-change {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .trend-change.danger {
+            color: #ff3b30;
+        }
+
+        .trend-change.success {
+            color: #4cd964;
+        }
+
+        .recommendation-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .recommendation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .recommendation-header h4 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .risk-level-indicator {
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .risk-level-indicator.extreme {
+            background-color: #ff3b30;
+            color: white;
+        }
+
+        .recommendation-steps {
+            margin-bottom: 20px;
+        }
+
+        .step {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: var(--primary-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-content h5 {
+            margin: 0 0 5px 0;
+            font-size: 1rem;
+        }
+
+        .step-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .recommendation-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .risk-factors-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .risk-trend-details {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部导航 -->
+        <nav class="top-nav">
+            <div class="nav-brand">信用管理系统</div>
+            <div class="nav-items">
+                <a href="index.html" class="nav-item">仪表盘</a>
+                <a href="data-import.html" class="nav-item">数据导入</a>
+                <a href="customer-management.html" class="nav-item">客户管理</a>
+                <a href="risk-monitor.html" class="nav-item active">风险监控</a>
+            </div>
+            <div class="nav-profile">
+                <span class="user-name">管理员</span>
+                <div class="avatar">A</div>
+            </div>
+        </nav>
+
+        <div class="main-content">
+            <!-- 主内容区 -->
+            <div class="content-wrapper">
+                <!-- 风险概览卡片 -->
+                <div class="risk-summary-cards">
+                    <div class="risk-summary-card">
+                        <div class="risk-card-icon yellow">
+                            <i class="fas fa-exclamation"></i>
+                        </div>
+                        <div class="risk-card-title">黄色预警</div>
+                        <div class="risk-card-value">8</div>
+                        <div class="risk-card-desc">逾期30天内</div>
+                    </div>
+                    
+                    <div class="risk-summary-card">
+                        <div class="risk-card-icon orange">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="risk-card-title">橙色预警</div>
+                        <div class="risk-card-value">5</div>
+                        <div class="risk-card-desc">逾期30-60天</div>
+                    </div>
+                    
+                    <div class="risk-summary-card">
+                        <div class="risk-card-icon red">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="risk-card-title">红色预警</div>
+                        <div class="risk-card-value">3</div>
+                        <div class="risk-card-desc">逾期60-90天</div>
+                    </div>
+                    
+                    <div class="risk-summary-card">
+                        <div class="risk-card-icon black">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <div class="risk-card-title">黑色预警</div>
+                        <div class="risk-card-value">2</div>
+                        <div class="risk-card-desc">逾期90天以上</div>
+                    </div>
+                </div>
+                
+                <!-- 风险筛选栏 -->
+                <div class="risk-filter-bar">
+                    <div class="risk-filter-label">风险级别：</div>
+                    <div class="risk-filter-options">
+                        <div class="risk-filter-option active">全部</div>
+                        <div class="risk-filter-option yellow">黄色预警</div>
+                        <div class="risk-filter-option orange">橙色预警</div>
+                        <div class="risk-filter-option red">红色预警</div>
+                        <div class="risk-filter-option black">黑色预警</div>
+                    </div>
+                </div>
+                
+                <!-- 风险提醒列表 -->
+                <div class="risk-level-cards">
+                    <div class="risk-card yellow">
+                        <div class="risk-card-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="risk-card-value">12</div>
+                        <div class="risk-card-desc">逾期30天内</div>
+                    </div>
+                    <!-- 其他三级预警卡片 -->
+                </div>
+                <div class="risk-alert-list">
+                    <!-- 黄色预警 -->
+                    <div class="risk-alert-item">
+                        <div class="risk-alert-icon" style="background-color: var(--warning-yellow);">
+                            <i class="fas fa-exclamation"></i>
+                        </div>
+                        <div class="risk-alert-content">
+                            <div class="risk-alert-title">
+                                <span>合肥格力 - 黄色预警</span>
+                                <span class="risk-alert-date">2023-04-15</span>
+                            </div>
+                            <div class="risk-alert-desc">该客户存在逾期风险，已逾期25天，请及时跟进</div>
+                            <div class="risk-alert-details">
+                                <div class="risk-alert-detail">
+                                    <span class="risk-alert-detail-label">逾期金额：</span>
+                                    <span class="risk-alert-detail-value">¥16,970</span>
+                                </div>
+                                <div class="risk-alert-detail">
+                                    <span class="risk-alert-detail-label">信用评级：</span>
+                                    <span class="risk-alert-detail-value">B级</span>
+                                </div>
+                                <div class="risk-alert-detail">
+                                    <span class="risk-alert-detail-label">业务员：</span>
+                                    <span class="risk-alert-detail-value">李四</span>
+                                </div>
+                            </div>
+                            <div class="risk-alert-actions">
+                                <button class="btn btn-secondary">查看详情</button>
+                                <button class="btn btn-primary">标记已处理</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 橙色预警 -->
+                    <div class="risk-alert-item">
+                        <div class="risk-alert-icon" style="background-color: #FF9500;">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="risk-alert-content">
+                            <div class="risk-alert-title">
+                                <span>南京格力 - 橙色预警</span>
+                                <span class="risk-alert-date">2023-03-28</span>
+                            </div>
+                            <div class="risk-alert-desc">该客户存在严重逾期风险，已逾期45天，需要缩短账期或增加预付款比例</div>
+                            <div class="risk-alert-details">
+                                <div class="risk-alert-detail">
+                                    <span class="risk-alert-detail-label">逾期金额：</span>
+                                    <span class="risk-alert-detail-value">¥2,030</span>
+                                </div>
+                                <div class="risk-alert-detail">
+                                    <span class="risk-alert-detail-label">信用评级：</span>
+                                    <span class="risk-alert-detail-value">C级</span>
+                                </div>
+                                <div class="risk-alert-detail">
+                                    <span class="risk-alert-detail-label">业务员：</span>
+                                    <span class="risk-alert-detail-value">王五</span>
+                                </div>
+                            </div>
+                            <div class="risk-alert-actions">
+                                <button class="btn btn-secondary">查看详情</button>
+                                <button class="btn btn-primary">标记已处理</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 红色预警 -->
+                    <div class="risk-alert-item">
+                        <div class="risk-alert-icon" style="background-color: var(--danger-red);">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="risk-alert-content">
+                            <div class="risk-alert-title">
+                                <span>武汉美的 - 红色预警</span>
+                                <span class="risk-alert-date">2023-02-15</span>
+                            </div>
+                            <div class="risk-alert-desc">该客户存在高度逾期风险，已逾期75天，暂停发货，需主管特批</div>
+                            <div class="risk-alert-details">
+                                <div class="risk-alert-detail">
+                                    <span class="risk-alert-detail-label">逾期金额：</span>
+                                    <span class="risk-alert-detail-value">¥905,230</span>
+                                </div>
+                                <div class="risk-alert-detail">
+                                    <span class="risk-alert-detail-label">信用评级：</span>
+                                    <span class="risk-alert-detail-value">D级</span>
+                                </div>
+                                <div class="risk-alert-detail">
+                                    <span class="risk-alert-detail-label">业务员：</span>
+                                    <span class="risk-alert-detail-value">赵六</span>
+                                </div>
+                            </div>
+                            <div class="risk-alert-actions">
+                                <button class="btn btn-secondary">查看详情</button>
+                                <button class="btn btn-danger">申请特批</button>
+                                <button class="btn btn-primary">标记已处理</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 黑色预警 -->
+                    <div class="risk-alert-item">
+                        <div class="risk-alert-icon" style="background-color: #000;">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <div class="risk-alert-content">
+                            <div class="risk-alert-title">
+                                <span>苏州美的 - 黑色预警</span>
+                                <span class="risk-alert-date">2023-01-10</span>
+                            </div>
+                            <div class="risk-alert-desc">该客户存在极高逾期风险，已逾期110天，冻结账户，停止一切业务往来</div>
+                            <div class="risk-alert-details">
+                                <div class="risk-alert-detail">
+                                    <span class="risk-alert-detail-label">逾期金额：</span>
+                                    <span class="risk-alert-detail-value">¥1,250,800</span>
+                                </div>
+                                <div class="risk-alert-detail">
+                                    <span class="risk-alert-detail-label">信用评级：</span>
+                                    <span class="risk-alert-detail-value">D级</span>
+                                </div>
+                                <div class="risk-alert-detail">
+                                    <span class="risk-alert-detail-label">业务员：</span>
+                                    <span class="risk-alert-detail-value">钱七</span>
+                                </div>
+                            </div>
+                            <div class="risk-alert-actions">
+                                <button class="btn btn-secondary">查看详情</button>
+                                <button class="btn btn-danger">法务处理</button>
+                                <button class="btn btn-primary">标记已处理</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 风险处理模态框 -->
+    <div class="modal" id="riskProcessModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">风险处理</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>处理方式</label>
+                    <select class="form-control" id="processMethod">
+                        <option value="contact">联系客户</option>
+                        <option value="reduce">缩短账期</option>
+                        <option value="increase">增加预付款比例</option>
+                        <option value="stop">暂停发货</option>
+                        <option value="legal">法务处理</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>处理备注</label>
+                    <textarea class="form-control" id="processRemark" rows="3" placeholder="请输入处理备注..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>处理人</label>
+                    <input type="text" class="form-control" id="processor" value="管理员" readonly>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" onclick="closeModal(document.getElementById('riskProcessModal'))">取消</button>
+                    <button class="btn btn-primary" onclick="submitRiskProcess()">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 风险详情分析模态框 -->
+    <div class="modal" id="riskAnalysisModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-chart-line"></i> 风险详情分析</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="customer-profile">
+                    <div class="profile-header">
+                        <h3 id="risk-customer-name">客户名称</h3>
+                        <div class="risk-badge" id="risk-customer-rating">C级</div>
+                    </div>
+                    <div class="profile-summary">
+                        <div class="profile-stat">
+                            <span class="stat-label">授信额度</span>
+                            <span class="stat-value" id="risk-credit-limit">¥1,500,000</span>
+                        </div>
+                        <div class="profile-stat">
+                            <span class="stat-label">已用额度</span>
+                            <span class="stat-value" id="risk-used-credit">¥905,230</span>
+                        </div>
+                        <div class="profile-stat">
+                            <span class="stat-label">应收账款</span>
+                            <span class="stat-value" id="risk-receivable">¥905,230</span>
+                        </div>
+                        <div class="profile-stat">
+                            <span class="stat-label">逾期金额</span>
+                            <span class="stat-value" id="risk-overdue">¥905,230</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="risk-analysis-tabs">
+                    <div class="tab-headers">
+                        <div class="tab active" data-tab="risk-factors">风险因素</div>
+                        <div class="tab" data-tab="payment-history">回款历史</div>
+                        <div class="tab" data-tab="risk-trend">风险趋势</div>
+                        <div class="tab" data-tab="recommendation">处理建议</div>
+                    </div>
+                    <div class="tab-contents">
+                        <!-- 风险因素 -->
+                        <div class="tab-content active" id="risk-factors-tab">
+                            <div class="risk-factors-container">
+                                <div class="risk-factor">
+                                    <div class="risk-factor-header">
+                                        <div class="risk-factor-title">付款历史</div>
+                                        <div class="risk-factor-score danger">2/30分</div>
+                                    </div>
+                                    <div class="risk-factor-body">
+                                        <p>客户在过去6个月内有4次严重逾期，平均逾期时间为75天。最近一次付款已逾期90天以上。</p>
+                                        <ul class="risk-detail-list">
+                                            <li>上一次回款：2023-01-05 (已逾期105天)</li>
+                                            <li>连续逾期订单：4笔</li>
+                                            <li>逾期总金额：¥905,230</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="risk-factor">
+                                    <div class="risk-factor-header">
+                                        <div class="risk-factor-title">财务状况</div>
+                                        <div class="risk-factor-score warning">12/25分</div>
+                                    </div>
+                                    <div class="risk-factor-body">
+                                        <p>客户财务状况不佳，营业收入下降15%，利润率低于行业平均水平。</p>
+                                        <ul class="risk-detail-list">
+                                            <li>营收同比：<span class="text-danger">-15.2%</span></li>
+                                            <li>利润率：5.3% (行业平均：8.7%)</li>
+                                            <li>经营现金流：<span class="text-danger">减少25%</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="risk-factor">
+                                    <div class="risk-factor-header">
+                                        <div class="risk-factor-title">业务规模与稳定性</div>
+                                        <div class="risk-factor-score danger">5/20分</div>
+                                    </div>
+                                    <div class="risk-factor-body">
+                                        <p>客户业务规模持续缩减，市场份额减少，订单量波动明显。</p>
+                                        <ul class="risk-detail-list">
+                                            <li>近六个月订单量：<span class="text-danger">减少30%</span></li>
+                                            <li>市场占有率：从3.5%降至2.2%</li>
+                                            <li>库存周转率：降低25%</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="risk-factor">
+                                    <div class="risk-factor-header">
+                                        <div class="risk-factor-title">行业地位与声誉</div>
+                                        <div class="risk-factor-score warning">8/15分</div>
+                                    </div>
+                                    <div class="risk-factor-body">
+                                        <p>客户在行业中处于中下游位置，近期有负面新闻报道。</p>
+                                        <ul class="risk-detail-list">
+                                            <li>行业排名：第37位（去年第29位）</li>
+                                            <li>负面舆情：3条（涉及产品质量和供应商欠款）</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="risk-factor">
+                                    <div class="risk-factor-header">
+                                        <div class="risk-factor-title">合作关系</div>
+                                        <div class="risk-factor-score warning">6/10分</div>
+                                    </div>
+                                    <div class="risk-factor-body">
+                                        <p>合作时间较短，业务往来不稳定，沟通响应时间较长。</p>
+                                        <ul class="risk-detail-list">
+                                            <li>合作年限：1年7个月</li>
+                                            <li>近半年沟通次数：12次（平均每次解决问题时间：5天）</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="risk-score-summary">
+                                <div class="total-score-container">
+                                    <div class="total-score-label">风险评分</div>
+                                    <div class="total-score">33</div>
+                                    <div class="total-score-max">/100</div>
+                                </div>
+                                <div class="score-analysis">
+                                    <p>根据综合评分，该客户风险等级为：<span class="risk-level-d">D级（极高风险）</span></p>
+                                    <p>建议：停止新订单，追回已发货物，启动法务流程</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 回款历史 -->
+                        <div class="tab-content" id="payment-history-tab">
+                            <div class="payment-history-chart-container">
+                                <canvas id="paymentHistoryChart" height="250"></canvas>
+                            </div>
+                            <div class="payment-history-table">
+                                <h4>近期回款记录</h4>
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>订单日期</th>
+                                            <th>订单金额</th>
+                                            <th>约定回款日</th>
+                                            <th>实际回款日</th>
+                                            <th>逾期天数</th>
+                                            <th>状态</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>2023-01-15</td>
+                                            <td>¥890,450</td>
+                                            <td>2023-01-30</td>
+                                            <td>未回款</td>
+                                            <td>95+</td>
+                                            <td><span class="status-badge overdue">严重逾期</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2022-12-05</td>
+                                            <td>¥100,000</td>
+                                            <td>2022-12-20</td>
+                                            <td>2023-01-05</td>
+                                            <td>16</td>
+                                            <td><span class="status-badge completed">已回款</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2022-11-10</td>
+                                            <td>¥50,000</td>
+                                            <td>2022-11-25</td>
+                                            <td>2022-12-20</td>
+                                            <td>25</td>
+                                            <td><span class="status-badge completed">已回款</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2022-10-20</td>
+                                            <td>¥75,000</td>
+                                            <td>2022-11-05</td>
+                                            <td>2022-11-30</td>
+                                            <td>25</td>
+                                            <td><span class="status-badge completed">已回款</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- 风险趋势 -->
+                        <div class="tab-content" id="risk-trend-tab">
+                            <div class="risk-trend-chart-container">
+                                <canvas id="riskTrendChartDetail" height="250"></canvas>
+                            </div>
+                            <div class="risk-trend-summary">
+                                <h4>风险趋势分析</h4>
+                                <p>该客户风险评分逐月恶化，从6个月前的C级（52分）下降到当前的D级（33分）。逾期金额持续增加，回款意愿显著降低。</p>
+                                <div class="risk-trend-details">
+                                    <div class="trend-detail">
+                                        <div class="trend-label">资产负债率</div>
+                                        <div class="trend-value">83.7%</div>
+                                        <div class="trend-change danger">↑15.3%</div>
+                                    </div>
+                                    <div class="trend-detail">
+                                        <div class="trend-label">流动比率</div>
+                                        <div class="trend-value">0.82</div>
+                                        <div class="trend-change danger">↓0.31</div>
+                                    </div>
+                                    <div class="trend-detail">
+                                        <div class="trend-label">销售额</div>
+                                        <div class="trend-value">¥4.2M</div>
+                                        <div class="trend-change danger">↓22.5%</div>
+                                    </div>
+                                    <div class="trend-detail">
+                                        <div class="trend-label">平均逾期天数</div>
+                                        <div class="trend-value">68天</div>
+                                        <div class="trend-change danger">↑32天</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 处理建议 -->
+                        <div class="tab-content" id="recommendation-tab">
+                            <div class="recommendation-container">
+                                <div class="recommendation-header">
+                                    <h4>风险处理建议</h4>
+                                    <div class="risk-level-indicator extreme">极高风险</div>
+                                </div>
+                                <div class="recommendation-steps">
+                                    <div class="step">
+                                        <div class="step-number">1</div>
+                                        <div class="step-content">
+                                            <h5>立即冻结客户账户</h5>
+                                            <p>禁止新订单录入，对现有订单暂停发货处理。</p>
+                                        </div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">2</div>
+                                        <div class="step-content">
+                                            <h5>启动应收账款催收流程</h5>
+                                            <p>安排业务与财务团队联合进行催收，要求3个工作日内给出明确的还款计划。</p>
+                                        </div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">3</div>
+                                        <div class="step-content">
+                                            <h5>法务介入准备</h5>
+                                            <p>准备法务文件，如客户在7个工作日内无实质性还款行为，直接启动法律程序。</p>
+                                        </div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">4</div>
+                                        <div class="step-content">
+                                            <h5>资产保全与抵押</h5>
+                                            <p>评估客户可用于抵押的资产，准备资产保全申请，必要时考虑接受资产抵债。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="recommendation-actions">
+                                    <button class="btn btn-secondary">下载报告</button>
+                                    <button class="btn btn-danger">启动法务处理</button>
+                                    <button class="btn btn-primary">指派处理团队</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+    <script src="credit-rating.js"></script>
+    <script src="risk-analysis.js"></script>
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化风险筛选
+            initRiskFilter();
+            
+            // 初始化风险处理按钮
+            initRiskProcessButtons();
+            
+            // 初始化模态框
+            initModals();
+        });
+        
+        // 初始化风险筛选
+        function initRiskFilter() {
+            const filterOptions = document.querySelectorAll('.risk-filter-option');
+            const riskAlertItems = document.querySelectorAll('.risk-alert-item');
+            
+            filterOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // 移除所有选项的active类
+                    filterOptions.forEach(opt => opt.classList.remove('active'));
+                    
+                    // 添加active类到当前选项
+                    this.classList.add('active');
+                    
+                    // 获取筛选类型
+                    const filterType = this.textContent.trim();
+                    
+                    // 筛选风险提醒
+                    riskAlertItems.forEach(item => {
+                        const itemTitle = item.querySelector('.risk-alert-title span').textContent;
+                        
+                        if (filterType === '全部') {
+                            item.style.display = '';
+                        } else {
+                            if (itemTitle.includes(filterType)) {
+                                item.style.display = '';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        }
+                    });
+                    
+                    // 显示筛选结果通知
+                    showNotification(`已筛选显示${filterType}的风险预警`);
+                });
+            });
+        }
+        
+        // 初始化风险处理按钮
+        function initRiskProcessButtons() {
+            const processButtons = document.querySelectorAll('.btn-primary');
+            processButtons.forEach(button => {
+                if (button.textContent.trim() === '标记已处理') {
+                    button.addEventListener('click', function() {
+                        const alertItem = this.closest('.risk-alert-item');
+                        const customerName = alertItem.querySelector('.risk-alert-title span').textContent.split(' - ')[0];
+                        showRiskProcessModal(customerName);
+                    });
+                }
+            });
+            
+            // 查看详情按钮
+            const detailButtons = document.querySelectorAll('.btn-secondary');
+            detailButtons.forEach(button => {
+                if (button.textContent.trim() === '查看详情') {
+                    button.addEventListener('click', function() {
+                        const alertItem = this.closest('.risk-alert-item');
+                        const customerName = alertItem.querySelector('.risk-alert-title span').textContent.split(' - ')[0];
+                        showCustomerDetailModal(customerName);
+                    });
+                }
+            });
+            
+            // 特批按钮
+            const specialButtons = document.querySelectorAll('.btn-danger');
+            specialButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const alertItem = this.closest('.risk-alert-item');
+                    const customerName = alertItem.querySelector('.risk-alert-title span').textContent.split(' - ')[0];
+                    showSpecialApprovalModal(customerName);
+                });
+            });
+        }
+        
+        // 初始化模态框
+        function initModals() {
+            const closeButtons = document.querySelectorAll('.close-btn');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    closeModal(modal);
+                });
+            });
+        }
+        
+        // 显示风险处理模态框
+        function showRiskProcessModal(customerName) {
+            const modal = document.getElementById('riskProcessModal');
+            const modalTitle = modal.querySelector('.modal-title');
+            
+            modalTitle.textContent = `风险处理 - ${customerName}`;
+            
+            // 重置表单
+            document.getElementById('processMethod').value = 'contact';
+            document.getElementById('processRemark').value = '';
+            
+            openModal(modal);
+        }
+        
+        // 显示客户详情模态框
+        function showCustomerDetailModal(customerName) {
+            // 这里应该是真实项目中的客户详情模态框
+            // 由于当前页面没有该模态框，我们模拟一下
+            showNotification(`正在查看${customerName}的详细信息`);
+            
+            // 模拟加载数据
+            setTimeout(() => {
+                window.location.href = `customer-management.html?customer=${encodeURIComponent(customerName)}`;
+            }, 500);
+        }
+        
+        // 显示特批申请模态框
+        function showSpecialApprovalModal(customerName) {
+            // 这里应该是真实项目中的特批申请模态框
+            // 由于当前页面没有该模态框，我们模拟一下
+            showNotification(`正在为${customerName}发起特批申请`);
+            
+            // 模拟提交
+            setTimeout(() => {
+                showNotification(`已成功发起对${customerName}的特批申请，请等待主管审批`, 'success');
+            }, 1000);
+        }
+        
+        // 提交风险处理
+        function submitRiskProcess() {
+            const method = document.getElementById('processMethod').value;
+            const remark = document.getElementById('processRemark').value;
+            const modalTitle = document.getElementById('riskProcessModal').querySelector('.modal-title').textContent;
+            const customerName = modalTitle.split(' - ')[1];
+            
+            if (!remark.trim()) {
+                showNotification('请输入处理备注', 'error');
+                document.getElementById('processRemark').focus();
+                return;
+            }
+            
+            // 显示处理中状态
+            const submitButton = document.querySelector('#riskProcessModal .btn-primary');
+            submitButton.textContent = '处理中...';
+            submitButton.disabled = true;
+            
+            // 在实际项目中，这里应该调用API保存处理结果
+            console.log(`客户: ${customerName}, 处理方式: ${method}, 备注: ${remark}`);
+            
+            // 模拟处理延迟
+            setTimeout(() => {
+            // 关闭模态框
+            closeModal(document.getElementById('riskProcessModal'));
+                
+                // 恢复按钮状态
+                submitButton.textContent = '提交';
+                submitButton.disabled = false;
+                
+                // 从列表中移除已处理的风险提醒
+                const alertItems = document.querySelectorAll('.risk-alert-item');
+                alertItems.forEach(item => {
+                    const itemTitle = item.querySelector('.risk-alert-title span').textContent;
+                    if (itemTitle.includes(customerName)) {
+                        // 添加淡出效果
+                        item.style.opacity = '0';
+                        item.style.transform = 'translateX(20px)';
+                        item.style.transition = 'all 0.3s ease';
+                        
+                        // 移除元素
+                        setTimeout(() => {
+                            item.remove();
+                            
+                            // 更新风险统计数字
+                            updateRiskCounters();
+                        }, 300);
+                    }
+                });
+            
+            // 显示成功提示
+                showNotification(`${customerName}的风险处理已成功提交`, 'success');
+            }, 1500);
+        }
+        
+        // 更新风险统计数字
+        function updateRiskCounters() {
+            // 统计各类型风险提醒的数量
+            const yellowWarnings = document.querySelectorAll('.risk-alert-item .risk-alert-icon[style*="var(--warning-yellow)"]').length;
+            const orangeWarnings = document.querySelectorAll('.risk-alert-item .risk-alert-icon[style*="#FF9500"]').length;
+            const redWarnings = document.querySelectorAll('.risk-alert-item .risk-alert-icon[style*="var(--danger-red)"]').length;
+            const blackWarnings = document.querySelectorAll('.risk-alert-item .risk-alert-icon[style*="#000"]').length;
+            
+            // 更新卡片显示
+            document.querySelector('.risk-summary-cards .risk-summary-card:nth-child(1) .risk-card-value').textContent = yellowWarnings;
+            document.querySelector('.risk-summary-cards .risk-summary-card:nth-child(2) .risk-card-value').textContent = orangeWarnings;
+            document.querySelector('.risk-summary-cards .risk-summary-card:nth-child(3) .risk-card-value').textContent = redWarnings;
+            document.querySelector('.risk-summary-cards .risk-summary-card:nth-child(4) .risk-card-value').textContent = blackWarnings;
+        }
+        
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.className = 'notification ' + type;
+            
+            // 根据类型设置图标
+            let icon = '';
+            switch(type) {
+                case 'success':
+                    icon = '<i class="fas fa-check-circle"></i>';
+                    break;
+                case 'error':
+                    icon = '<i class="fas fa-exclamation-circle"></i>';
+                    break;
+                case 'warning':
+                    icon = '<i class="fas fa-exclamation-triangle"></i>';
+                    break;
+                default: // info
+                    icon = '<i class="fas fa-info-circle"></i>';
+            }
+            
+            // 设置内容
+            notification.innerHTML = `${icon} <span>${message}</span>`;
+            
+            // 添加样式
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.padding = '12px 16px';
+            notification.style.borderRadius = '4px';
+            notification.style.background = type === 'success' ? '#4cd964' : 
+                                           type === 'error' ? '#ff3b30' : 
+                                           type === 'warning' ? '#ffcc00' : '#007aff';
+            notification.style.color = '#fff';
+            notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+            notification.style.zIndex = '9999';
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateY(-20px)';
+            notification.style.transition = 'all 0.3s ease';
+            
+            // 添加到页面
+            document.body.appendChild(notification);
+            
+            // 显示通知
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateY(0)';
+            }, 10);
+            
+            // 自动关闭
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(-20px)';
+                
+                // 移除元素
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
+        // 打开模态框
+        function openModal(modal) {
+            if (!modal) return;
+            
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden'; // 防止背景滚动
+        }
+        
+        // 关闭模态框
+        function closeModal(modal) {
+            if (!modal) return;
+            
+            modal.classList.remove('show');
+            document.body.style.overflow = ''; // 恢复背景滚动
+        }
+
+        // 页面加载完成后检查是否有从仪表盘跳转过来的选定客户
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const selectedCustomer = sessionStorage.getItem('selectedCustomer');
+                if (selectedCustomer) {
+                    // 清除会话存储
+                    sessionStorage.removeItem('selectedCustomer');
+                    
+                    // 查找匹配客户的风险项
+                    const alertItems = document.querySelectorAll('.risk-alert-item');
+                    let matchFound = false;
+                    
+                    alertItems.forEach(item => {
+                        const itemTitle = item.querySelector('.risk-alert-title span').textContent;
+                        if (itemTitle.includes(selectedCustomer)) {
+                            // 高亮显示匹配的风险项
+                            item.style.boxShadow = '0 0 0 2px var(--primary-blue)';
+                            
+                            // 滚动到该项
+                            item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            
+                            // 获取详情信息
+                            const customerInfo = itemTitle.split(' - ');
+                            const riskLevel = customerInfo[1];
+                            const overdueAmount = item.querySelector('.risk-alert-detail-value').textContent;
+                            const creditRating = item.querySelectorAll('.risk-alert-detail-value')[1].textContent;
+                            
+                            // 延迟展示风险分析模态框，给用户时间看到高亮的风险项
+                            setTimeout(() => {
+                                showRiskAnalysisModal(selectedCustomer, riskLevel, overdueAmount, creditRating);
+                            }, 1000);
+                            
+                            matchFound = true;
+                        }
+                    });
+                    
+                    if (!matchFound) {
+                        showNotification(`未找到客户"${selectedCustomer}"的风险记录`, 'warning');
+                    }
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

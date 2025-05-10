@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户管理 - 客户信用管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="credit-rating.css">
+    <link rel="stylesheet" href="components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部导航 -->
+        <nav class="top-nav">
+            <div class="nav-brand">信用管理系统</div>
+            <div class="nav-items">
+                <a href="index.html" class="nav-item">综合仪表盘</a>
+                <a href="data-import.html" class="nav-item">数据导入</a>
+                <a href="customer-management.html" class="nav-item active">客户管理</a>
+                <a href="risk-monitor.html" class="nav-item">风险监控</a>
+            </div>
+            <div class="nav-profile">
+                <span class="user-name">管理员</span>
+                <div class="avatar">A</div>
+            </div>
+        </nav>
+
+        <div class="main-content">
+            <!-- 主内容区 -->
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <h1 class="page-title">客户管理</h1>
+                    <div class="page-actions">
+                        <button class="btn-primary" id="importDataBtn">
+                            <i class="fas fa-file-import"></i> 导入数据
+                        </button>
+                        <button class="btn-secondary" id="manualAddBtn">
+                            <i class="fas fa-plus"></i> 人工录入
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 客户数据表格 -->
+                <div class="card table-card">
+                    <div class="card-header">
+                        <h3 class="card-title">客户信息</h3>
+                        <div class="card-actions">
+                        <div class="search-container">
+                                <input type="text" class="search-input" placeholder="搜索客户...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                            <button class="btn-primary add-customer-btn">
+                                <i class="fas fa-plus"></i> 添加客户
+                            </button>
+                            <button class="btn-primary filter-btn">
+                                <i class="fas fa-filter"></i> 筛选
+                            </button>
+                            <button class="btn-primary export-data-btn">
+                                <i class="fas fa-download"></i> 导出
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="data-table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th data-sort="name">客户名称 <i class="fas fa-sort-down"></i></th>
+                                        <th data-sort="contact">联系人</th>
+                                        <th data-sort="phone">联系电话</th>
+                                        <th data-sort="credit">授信额度</th>
+                                        <th data-sort="used">已用额度</th>
+                                        <th data-sort="receivable">应收账款</th>
+                                        <th data-sort="lastPayment">最后回款日期</th>
+                                        <th data-sort="terms">月结天数</th>
+                                        <th data-sort="rating">信用评级</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="risk-low" data-customer-id="1">
+                                        <td>芜湖格力</td>
+                                        <td>张经理</td>
+                                        <td>13812345678</td>
+                                        <td>¥1,500,000</td>
+                                        <td>¥178,490</td>
+                                        <td>¥179,670</td>
+                                        <td>2023-03-17</td>
+                                        <td>30天</td>
+                                        <td><span class="risk-badge low">A级</span></td>
+                                        <td>
+                                            <button class="btn-icon view-detail-btn" data-customer-name="芜湖格力">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon edit-btn">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-icon rating-adjust-btn">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="risk-low" data-customer-id="2">
+                                        <td>武汉格力</td>
+                                        <td>李经理</td>
+                                        <td>13987654321</td>
+                                        <td>¥1,500,000</td>
+                                        <td>¥2,170</td>
+                                        <td>¥2,170</td>
+                                        <td>2023-02-20</td>
+                                        <td>30天</td>
+                                        <td><span class="risk-badge low">A级</span></td>
+                                        <td>
+                                            <button class="btn-icon view-detail-btn" data-customer-name="武汉格力">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon edit-btn">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-icon rating-adjust-btn">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="risk-medium" data-customer-id="3">
+                                        <td>合肥格力</td>
+                                        <td>王经理</td>
+                                        <td>13765432198</td>
+                                        <td>¥1,500,000</td>
+                                        <td>¥16,970</td>
+                                        <td>¥16,970</td>
+                                        <td>2023-01-25</td>
+                                        <td>30天</td>
+                                        <td><span class="risk-badge medium">B级</span></td>
+                                        <td>
+                                            <button class="btn-icon view-detail-btn" data-customer-name="合肥格力">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon edit-btn">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-icon rating-adjust-btn">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="risk-high" data-customer-id="4">
+                                        <td>南京格力</td>
+                                        <td>赵经理</td>
+                                        <td>13698765432</td>
+                                        <td>¥1,500,000</td>
+                                        <td>¥1,940</td>
+                                        <td>¥2,030</td>
+                                        <td>2022-12-20</td>
+                                        <td>30天</td>
+                                        <td><span class="risk-badge high">C级</span></td>
+                                        <td>
+                                            <button class="btn-icon view-detail-btn" data-customer-name="南京格力">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon edit-btn">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-icon rating-adjust-btn">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="risk-extreme" data-customer-id="5">
+                                        <td>武汉美的</td>
+                                        <td>钱经理</td>
+                                        <td>13512345678</td>
+                                        <td>¥1,200,000</td>
+                                        <td>¥890,450</td>
+                                        <td>¥905,230</td>
+                                        <td>2022-11-20</td>
+                                        <td>45天</td>
+                                        <td><span class="risk-badge extreme">D级</span></td>
+                                        <td>
+                                            <button class="btn-icon view-detail-btn" data-customer-name="武汉美的">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon edit-btn">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-icon rating-adjust-btn">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-footer">
+                            <div class="pagination">
+                                <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                                <button class="page-btn active">1</button>
+                                <button class="page-btn">2</button>
+                                <button class="page-btn">3</button>
+                                <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                            <div class="page-info">显示 1-5 条，共 128 条</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 客户详情模态框 -->
+    <div class="modal" id="customerDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">客户详情</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="customer-info">
+                    <div class="info-section">
+                        <h3 class="section-title">基本信息</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">客户名称</div>
+                                <div class="info-value" id="detail-customer-name"></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">联系人</div>
+                                <div class="info-value" id="detail-contact-person"></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">联系电话</div>
+                                <div class="info-value" id="detail-contact-phone"></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">信用评级</div>
+                                <div class="info-value"><span class="risk-badge" id="detail-credit-rating"></span></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">月结天数</div>
+                                <div class="info-value" id="detail-payment-terms"></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">业务员</div>
+                                <div class="info-value" id="detail-salesperson"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3 class="section-title">授信情况</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">授信额度</div>
+                                <div class="info-value" id="detail-credit-limit"></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">已用额度</div>
+                                <div class="info-value" id="detail-used-credit"></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">应收账款</div>
+                                <div class="info-value" id="detail-receivable"></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">授信使用率</div>
+                                <div class="info-value" id="detail-credit-usage"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3 class="section-title">历史订单</h3>
+                        <table class="info-table">
+                            <thead>
+                                <tr>
+                                    <th>订单日期</th>
+                                    <th>交易类型</th>
+                                    <th>金额</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detail-orders">
+                                <!-- 订单数据将由JS动态生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="editCustomerBtn">编辑客户</button>
+                <button class="btn-secondary close-modal-btn">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 人工录入模态框 -->
+    <div class="modal" id="addCustomerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">添加新客户</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-customer-form">
+                    <div class="form-group">
+                        <label>客户名称 <span class="required">*</span></label>
+                        <input type="text" name="customerName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>联系人</label>
+                        <input type="text" name="contactPerson" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>联系电话</label>
+                        <input type="text" name="contactPhone" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>授信额度</label>
+                        <input type="number" name="creditLimit" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>月结天数</label>
+                        <input type="number" name="paymentTerms" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>初始信用评级</label>
+                        <select name="creditRating" class="form-control">
+                            <option value="A">A级</option>
+                            <option value="B">B级</option>
+                            <option value="C">C级</option>
+                            <option value="D">D级</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>业务员</label>
+                        <select name="salesperson" class="form-control">
+                            <option value="张经理">张经理</option>
+                            <option value="李经理">李经理</option>
+                            <option value="王经理">王经理</option>
+                            <option value="赵经理">赵经理</option>
+                            <option value="钱经理">钱经理</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">保存</button>
+                        <button type="button" class="btn-secondary close-modal-btn">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据导入模态框 -->
+    <div class="modal" id="dataImportModal">
+        <div class="modal-content modal-xl">
+            <div class="modal-header">
+                <h2 class="modal-title">数据导入</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="import-container" id="import-container">
+                    <div class="import-tabs">
+                        <button class="import-tab active" data-tab="file-upload">文件上传</button>
+                        <button class="import-tab" data-tab="data-preview">数据预览</button>
+                        <button class="import-tab" data-tab="import-result">导入结果</button>
+                    </div>
+
+                    <div class="import-content active" id="file-upload">
+                        <div class="upload-area">
+                            <div class="upload-icon">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <h3>选择要导入的Excel文件</h3>
+                            <p>支持.xlsx或.xls格式，最大10MB</p>
+                            <div class="file-upload-container">
+                                <input type="file" id="file-upload-input" accept=".xlsx,.xls">
+                                <button class="btn-primary file-upload-btn">
+                                    <i class="fas fa-upload"></i> 选择文件
+                                </button>
+                            </div>
+                            <div class="file-name-display" id="file-name-display">
+                                <span>选中文件：</span>
+                                <span id="selected-file-name">未选择文件</span>
+                            </div>
+                        </div>
+                        <div class="import-template-section">
+                            <h4>导入模板说明</h4>
+                            <p>请按照以下格式准备导入数据：</p>
+                            <ul>
+                                <li><strong>客户名称</strong>：必填，与系统中已有客户匹配</li>
+                                <li><strong>交易类型</strong>：必填，销售/回款</li>
+                                <li><strong>交易日期</strong>：必填，格式YYYY-MM-DD</li>
+                                <li><strong>交易金额</strong>：必填，数字</li>
+                                <li><strong>联系人</strong>：选填</li>
+                                <li><strong>联系电话</strong>：选填</li>
+                            </ul>
+                            <button class="btn-secondary">
+                                <i class="fas fa-download"></i> 下载导入模板
+                            </button>
+                        </div>
+                        <div class="import-error" id="import-error"></div>
+                    </div>
+                    
+                    <div class="import-content" id="data-preview">
+                        <div class="import-stats" id="import-stats">
+                            <!-- 导入统计信息将通过JS生成 -->
+                        </div>
+                        
+                        <div class="import-preview-table">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>客户名称</th>
+                                        <th>交易类型</th>
+                                        <th>交易日期</th>
+                                        <th>交易金额</th>
+                                        <th>更新状态</th>
+                                        <th>数据变更</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="preview-data">
+                                    <!-- 数据预览将通过JS生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="import-actions">
+                            <button class="btn-secondary back-btn" data-target="file-upload">
+                                <i class="fas fa-arrow-left"></i> 返回
+                            </button>
+                            <button class="btn-primary" id="confirm-import-btn" disabled>
+                                <i class="fas fa-check"></i> 确认导入
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="import-content" id="import-result">
+                        <div class="import-result-container">
+                            <div class="import-result-icon success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3 class="import-result-title">数据导入成功</h3>
+                            <p class="import-result-message">所有数据已成功导入系统并更新相关客户信息</p>
+                            
+                            <div class="import-result-summary">
+                                <div class="result-item">
+                                    <span class="result-label">导入总数据：</span>
+                                    <span class="result-value" id="result-total">0</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">成功导入：</span>
+                                    <span class="result-value" id="result-success">0</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">更新客户：</span>
+                                    <span class="result-value" id="result-updated">0</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">新增客户：</span>
+                                    <span class="result-value" id="result-new">0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="import-result-actions">
+                                <button class="btn-secondary close-modal-btn">关闭</button>
+                                <button class="btn-primary" id="view-updated-data-btn">
+                                    <i class="fas fa-eye"></i> 查看更新数据
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 加载指示器 -->
+                    <div class="import-loading" id="import-loading">
+                        <div class="spinner"></div>
+                        <p>正在处理导入数据，请稍候...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 信用评级调整模态框 -->
+    <div class="modal" id="ratingAdjustModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">调整信用评级</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="adjust-rating-form">
+                    <div class="form-group">
+                        <label>客户名称</label>
+                        <div class="static-text" id="adjust-customer-name"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>当前信用评级</label>
+                        <div class="static-text"><span class="risk-badge" id="adjust-current-rating"></span></div>
+                    </div>
+                    <div class="form-group">
+                        <label>新信用评级 <span class="required">*</span></label>
+                        <select name="newRating" class="form-control" required>
+                            <option value="A">A级</option>
+                            <option value="B">B级</option>
+                            <option value="C">C级</option>
+                            <option value="D">D级</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>调整原因 <span class="required">*</span></label>
+                        <textarea name="adjustReason" class="form-control" rows="4" required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">确认调整</button>
+                        <button type="button" class="btn-secondary close-modal-btn">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="data-import.js"></script>
+    <script src="customer-management.js"></script>
+    <script src="customer-details.js"></script>
+</body>
+</html>

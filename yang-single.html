@@ -1,0 +1,2624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户信用风险管控系统 - 单机版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #3498db;
+            --primary-green: #27ae60;
+            --primary-orange: #f39c12;
+            --primary-red: #e74c3c;
+            --dark-blue: #2980b9;
+            --dark-gray: #2c3e50;
+            --light-gray: #7f8c8d;
+            --bg-gray: #f5f5f5;
+            --light-blue: #eef7ff;
+            --light-red: #ffeaea;
+            --light-orange: #fff8e7;
+            --light-green: #eafaf1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-gray);
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: var(--dark-blue);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: var(--light-gray);
+            text-align: center;
+        }
+        
+        .main-nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        
+        .main-nav-item {
+            padding: 8px 15px;
+            cursor: pointer;
+            margin: 0 5px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .main-nav-item:hover {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+        }
+        
+        .main-nav-item.active {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .panel {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            color: var(--dark-gray);
+            font-weight: bold;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--dark-blue);
+        }
+        
+        .btn-secondary {
+            background-color: var(--light-gray);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #6c7a7d;
+        }
+        
+        .btn-success {
+            background-color: var(--primary-green);
+        }
+        
+        .btn-success:hover {
+            background-color: #219955;
+        }
+        
+        .btn-danger {
+            background-color: var(--primary-red);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-warning {
+            background-color: var(--primary-orange);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            color: var(--dark-gray);
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .risk-high {
+            background-color: var(--light-red);
+        }
+        
+        .risk-medium {
+            background-color: var(--light-orange);
+        }
+        
+        .risk-low {
+            background-color: var(--light-green);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-active {
+            background-color: var(--primary-green);
+        }
+        
+        .status-warning {
+            background-color: var(--primary-orange);
+        }
+        
+        .status-danger {
+            background-color: var(--primary-red);
+        }
+        
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            background-color: #f8f9fa;
+            white-space: nowrap;
+        }
+        
+        .tab.active {
+            background-color: #fff;
+            border-color: #ddd;
+            border-bottom-color: transparent;
+            margin-bottom: -1px;
+        }
+        
+        .tab-content {
+            padding: 20px 0;
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .search-bar {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 14px;
+        }
+        
+        .search-btn {
+            padding: 10px 15px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .page-item {
+            margin: 0 5px;
+        }
+        
+        .page-link {
+            display: block;
+            padding: 8px 12px;
+            color: var(--primary-blue);
+            text-decoration: none;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .page-link:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .page-item.active .page-link {
+            background-color: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .info-card {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        
+        .info-card-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--dark-gray);
+            margin-bottom: 10px;
+        }
+        
+        .info-card-value {
+            font-size: 24px;
+            color: var(--dark-blue);
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .data-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        
+        .board-card {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .board-card-title {
+            font-size: 14px;
+            color: var(--light-gray);
+            margin-bottom: 5px;
+        }
+        
+        .board-card-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--dark-gray);
+        }
+        
+        .flex-grid {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .flex-grid-col {
+            flex: 1;
+        }
+        
+        .summary-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        
+        .card-header {
+            color: var(--light-gray);
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .card-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark-gray);
+        }
+        
+        .card-trend {
+            font-size: 12px;
+            color: var(--light-gray);
+            margin-top: 5px;
+        }
+        
+        .card-trend-up {
+            color: var(--primary-green);
+        }
+        
+        .card-trend-down {
+            color: var(--primary-red);
+        }
+        
+        .risk-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        .risk-badge.low {
+            background-color: var(--light-green);
+            color: var(--primary-green);
+        }
+        
+        .risk-badge.medium {
+            background-color: var(--light-orange);
+            color: #d35400;
+        }
+        
+        .risk-badge.high {
+            background-color: var(--light-red);
+            color: var(--primary-red);
+        }
+        
+        .risk-badge.extreme {
+            background-color: #7d3c98;
+            color: white;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--dark-gray);
+        }
+        
+        .close-btn {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--light-gray);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 4px;
+            background-color: #333;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1100;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            max-width: 350px;
+        }
+        
+        .notification.success {
+            background-color: var(--primary-green);
+        }
+        
+        .notification.error {
+            background-color: var(--primary-red);
+        }
+        
+        .notification.warning {
+            background-color: var(--primary-orange);
+        }
+        
+        .notification.info {
+            background-color: var(--primary-blue);
+        }
+        
+        .notification i {
+            margin-right: 10px;
+        }
+        
+        .risk-alert-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .risk-alert-item {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-red);
+        }
+        
+        .risk-alert-item.medium {
+            border-left-color: var(--primary-orange);
+        }
+        
+        .risk-alert-item.low {
+            border-left-color: var(--primary-green);
+        }
+        
+        .risk-alert-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: var(--dark-gray);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .risk-alert-details {
+            margin-top: 15px;
+        }
+        
+        .risk-alert-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .risk-alert-detail-label {
+            color: var(--light-gray);
+        }
+        
+        .risk-alert-detail-value {
+            font-weight: bold;
+            color: var(--dark-gray);
+        }
+        
+        .risk-alert-actions {
+            margin-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .risk-analysis-tabs {
+            margin-top: 20px;
+        }
+        
+        .risk-factor {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .risk-factor:last-child {
+            border-bottom: none;
+        }
+        
+        .risk-factor-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: var(--dark-gray);
+            margin-bottom: 10px;
+        }
+        
+        .risk-factor-body {
+            color: var(--light-gray);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .recommendation-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .text-danger {
+            color: var(--primary-red);
+            font-weight: bold;
+        }
+        
+        .customer-detail {
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+        
+        .customer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .customer-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark-gray);
+        }
+        
+        .customer-risk {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .customer-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .customer-info-item {
+            margin-bottom: 10px;
+        }
+        
+        .customer-info-label {
+            font-size: 14px;
+            color: var(--light-gray);
+            margin-bottom: 5px;
+        }
+        
+        .customer-info-value {
+            font-size: 16px;
+            color: var(--dark-gray);
+        }
+        
+        .customer-timeline {
+            margin-top: 30px;
+        }
+        
+        .timeline-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--dark-gray);
+            margin-bottom: 15px;
+        }
+        
+        .timeline-item {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .timeline-item:before {
+            content: "";
+            position: absolute;
+            left: 10px;
+            top: 5px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: var(--primary-blue);
+        }
+        
+        .timeline-item:after {
+            content: "";
+            position: absolute;
+            left: 17px;
+            top: 20px;
+            width: 2px;
+            height: calc(100% - 15px);
+            background-color: var(--primary-blue);
+        }
+        
+        .timeline-item:last-child:after {
+            display: none;
+        }
+        
+        .timeline-date {
+            font-size: 14px;
+            color: var(--light-gray);
+            margin-bottom: 5px;
+        }
+        
+        .timeline-content {
+            font-size: 16px;
+            color: var(--dark-gray);
+        }
+        
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .customer-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .flex-grid {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>客户信用风险管控系统</h1>
+            <p>全面管理客户信用，降低企业风险</p>
+            <div class="main-nav">
+                <div class="main-nav-item active" data-section="dashboard">仪表盘</div>
+                <div class="main-nav-item" data-section="customers">客户管理</div>
+                <div class="main-nav-item" data-section="risk-monitoring">风险监控</div>
+                <div class="main-nav-item" data-section="data-import">数据导入</div>
+                <div class="main-nav-item" data-section="credit-standards">信用标准</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- 仪表盘部分 -->
+            <div class="section active" id="dashboard-section">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">数据概览</div>
+                        <div>
+                            <select id="timeRange" class="form-select">
+                                <option value="month">本月</option>
+                                <option value="quarter">本季度</option>
+                                <option value="year">本年度</option>
+                            </select>
+                            <button class="btn btn-sm btn-refresh"><i class="fas fa-sync-alt"></i> 刷新</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="flex-grid">
+                            <div class="flex-grid-col">
+                                <div class="summary-card">
+                                    <div class="card-header">客户总数</div>
+                                    <div class="card-value">128</div>
+                                    <div class="card-trend card-trend-up">+3.2% 较上期</div>
+                                </div>
+                            </div>
+                            <div class="flex-grid-col">
+                                <div class="summary-card">
+                                    <div class="card-header">授信总额</div>
+                                    <div class="card-value">¥1,920,000</div>
+                                    <div class="card-trend card-trend-up">+5.7% 较上期</div>
+                                </div>
+                            </div>
+                            <div class="flex-grid-col">
+                                <div class="summary-card">
+                                    <div class="card-header">风险客户</div>
+                                    <div class="card-value">12</div>
+                                    <div class="card-trend card-trend-down">+2 较上期</div>
+                                </div>
+                            </div>
+                            <div class="flex-grid-col">
+                                <div class="summary-card">
+                                    <div class="card-header">逾期金额</div>
+                                    <div class="card-value">¥85,230</div>
+                                    <div class="card-trend card-trend-down">+12.3% 较上期</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-grid">
+                            <div class="flex-grid-col">
+                                <div class="panel-header">
+                                    <div class="panel-title">风险分布</div>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="riskChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="flex-grid-col">
+                                <div class="panel-header">
+                                    <div class="panel-title">授信使用分析</div>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="creditUseChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="panel-header">
+                            <div class="panel-title">关键风险客户</div>
+                            <button class="btn btn-sm" id="generateReportBtn">生成报告</button>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="name">客户名称 <i class="fas fa-sort"></i></th>
+                                    <th data-sort="credit">授信额度 <i class="fas fa-sort"></i></th>
+                                    <th data-sort="used">已用额度 <i class="fas fa-sort"></i></th>
+                                    <th data-sort="receivable">应收账款 <i class="fas fa-sort"></i></th>
+                                    <th data-sort="lastPayment">上次回款 <i class="fas fa-sort"></i></th>
+                                    <th data-sort="risk">风险等级 <i class="fas fa-sort"></i></th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="risk-high">
+                                    <td>南京格力</td>
+                                    <td>¥1,500,000</td>
+                                    <td>¥1,425,000</td>
+                                    <td>¥1,520,500</td>
+                                    <td>2023-01-15</td>
+                                    <td><span class="risk-badge high">C级</span></td>
+                                    <td>
+                                        <button class="btn btn-secondary btn-sm open-customer-detail">详情</button>
+                                    </td>
+                                </tr>
+                                <tr class="risk-high">
+                                    <td>苏州美的</td>
+                                    <td>¥1,000,000</td>
+                                    <td>¥1,250,800</td>
+                                    <td>¥1,250,800</td>
+                                    <td>2022-10-10</td>
+                                    <td><span class="risk-badge high">C级</span></td>
+                                    <td>
+                                        <button class="btn btn-secondary btn-sm open-customer-detail">详情</button>
+                                    </td>
+                                </tr>
+                                <tr class="risk-medium">
+                                    <td>合肥格力</td>
+                                    <td>¥1,500,000</td>
+                                    <td>¥950,000</td>
+                                    <td>¥965,500</td>
+                                    <td>2023-02-05</td>
+                                    <td><span class="risk-badge medium">B级</span></td>
+                                    <td>
+                                        <button class="btn btn-secondary btn-sm open-customer-detail">详情</button>
+                                    </td>
+                                </tr>
+                                <tr class="risk-medium">
+                                    <td>武汉美的</td>
+                                    <td>¥1,200,000</td>
+                                    <td>¥890,450</td>
+                                    <td>¥905,230</td>
+                                    <td>2022-12-20</td>
+                                    <td><span class="risk-badge medium">B级</span></td>
+                                    <td>
+                                        <button class="btn btn-secondary btn-sm open-customer-detail">详情</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">数据分析</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="flex-grid">
+                            <div class="flex-grid-col">
+                                <div class="info-card">
+                                    <div class="info-card-title">客户集中度分析</div>
+                                    <div class="chart-container" style="height: 200px;">
+                                        <canvas id="customerConcentrationChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-grid-col">
+                                <div class="info-card">
+                                    <div class="info-card-title">行业分布</div>
+                                    <div class="chart-container" style="height: 200px;">
+                                        <canvas id="industryDistributionChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-grid" style="margin-top: 20px;">
+                            <div class="flex-grid-col">
+                                <div class="info-card">
+                                    <div class="info-card-title">账款回收趋势</div>
+                                    <div class="chart-container" style="height: 200px;">
+                                        <canvas id="paymentTrendChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-grid-col">
+                                <div class="info-card">
+                                    <div class="info-card-title">信用风险趋势</div>
+                                    <div class="chart-container" style="height: 200px;">
+                                        <canvas id="riskTrendChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 客户管理部分 -->
+            <div class="section" id="customers-section">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">客户信用评级</div>
+                        <button class="btn" id="creditRatingBtn">信用评级</button>
+                    </div>
+                    <div class="panel-body">
+                        <div class="search-bar">
+                            <input type="text" class="search-input" placeholder="搜索客户...">
+                            <button class="search-btn">搜索</button>
+                        </div>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>客户名称</th>
+                                    <th>授信额度</th>
+                                    <th>已使用额度</th>
+                                    <th>应收账款</th>
+                                    <th>上次回款日期</th>
+                                    <th>月结天数</th>
+                                    <th>风险等级</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>芜湖格力</td>
+                                    <td>1,500.00</td>
+                                    <td>178.49</td>
+                                    <td>179.67</td>
+                                    <td>2025-03-17</td>
+                                    <td>30</td>
+                                    <td><span class="status-indicator status-active"></span> 低风险</td>
+                                    <td><button class="btn btn-secondary open-customer-detail" style="padding: 5px 10px;">详情</button></td>
+                                </tr>
+                                <tr>
+                                    <td>武汉格力</td>
+                                    <td>1,500.00</td>
+                                    <td>2.17</td>
+                                    <td>2.17</td>
+                                    <td>2025-04-01</td>
+                                    <td>30</td>
+                                    <td><span class="status-indicator status-active"></span> 低风险</td>
+                                    <td><button class="btn btn-secondary open-customer-detail" style="padding: 5px 10px;">详情</button></td>
+                                </tr>
+                                <tr class="risk-medium">
+                                    <td>合肥格力</td>
+                                    <td>1,500.00</td>
+                                    <td>16.97</td>
+                                    <td>16.97</td>
+                                    <td>2025-03-15</td>
+                                    <td>30</td>
+                                    <td><span class="status-indicator status-warning"></span> 中风险</td>
+                                    <td><button class="btn btn-secondary open-customer-detail" style="padding: 5px 10px;">详情</button></td>
+                                </tr>
+                                <tr class="risk-high">
+                                    <td>南京格力</td>
+                                    <td>1,500.00</td>
+                                    <td>1.94</td>
+                                    <td>2.03</td>
+                                    <td>2025-02-28</td>
+                                    <td>30</td>
+                                    <td><span class="status-indicator status-danger"></span> 高风险</td>
+                                    <td><button class="btn btn-secondary open-customer-detail" style="padding: 5px 10px;">详情</button></td>
+                                </tr>
+                                <tr>
+                                    <td>武汉美的</td>
+                                    <td>1,400.00</td>
+                                    <td>18.91</td>
+                                    <td>709.58</td>
+                                    <td>2025-05-01</td>
+                                    <td>30</td>
+                                    <td><span class="status-indicator status-active"></span> 低风险</td>
+                                    <td><button class="btn btn-secondary open-customer-detail" style="padding: 5px 10px;">详情</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="pagination">
+                            <div class="page-item">
+                                <a class="page-link" href="#">上一页</a>
+                            </div>
+                            <div class="page-item active">
+                                <a class="page-link" href="#">1</a>
+                            </div>
+                            <div class="page-item">
+                                <a class="page-link" href="#">2</a>
+                            </div>
+                            <div class="page-item">
+                                <a class="page-link" href="#">3</a>
+                            </div>
+                            <div class="page-item">
+                                <a class="page-link" href="#">下一页</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 风险监控部分 -->
+            <div class="section" id="risk-monitoring-section">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">风险预警</div>
+                        <div>
+                            <button class="btn btn-warning" id="processAllRisksBtn">批量处理</button>
+                            <button class="btn" id="exportRiskBtn">导出风险报告</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> 系统检测到 <strong>5</strong> 个高风险客户，请及时处理！
+                        </div>
+                        
+                        <div class="risk-alert-container">
+                            <div class="risk-alert-item">
+                                <div class="risk-alert-title">
+                                    <span>南京格力 - 高风险预警</span>
+                                    <span class="risk-badge high">C级</span>
+                                </div>
+                                <div class="risk-alert-description">
+                                    授信额度超额使用，逾期账款未结清，存在较高回款风险。
+                                </div>
+                                <div class="risk-alert-details">
+                                    <div class="risk-alert-detail">
+                                        <div class="risk-alert-detail-label">逾期金额</div>
+                                        <div class="risk-alert-detail-value">¥520,500</div>
+                                    </div>
+                                    <div class="risk-alert-detail">
+                                        <div class="risk-alert-detail-label">信用等级</div>
+                                        <div class="risk-alert-detail-value">C级</div>
+                                    </div>
+                                    <div class="risk-alert-detail">
+                                        <div class="risk-alert-detail-label">逾期天数</div>
+                                        <div class="risk-alert-detail-value">45天</div>
+                                    </div>
+                                </div>
+                                <div class="risk-alert-actions">
+                                    <button class="btn btn-secondary btn-sm open-risk-analysis">查看详情</button>
+                                </div>
+                            </div>
+                            
+                            <div class="risk-alert-item">
+                                <div class="risk-alert-title">
+                                    <span>苏州美的 - 高风险预警</span>
+                                    <span class="risk-badge high">C级</span>
+                                </div>
+                                <div class="risk-alert-description">
+                                    授信额度使用率过高，超出额度25%，连续三个月未回款。
+                                </div>
+                                <div class="risk-alert-details">
+                                    <div class="risk-alert-detail">
+                                        <div class="risk-alert-detail-label">逾期金额</div>
+                                        <div class="risk-alert-detail-value">¥250,800</div>
+                                    </div>
+                                    <div class="risk-alert-detail">
+                                        <div class="risk-alert-detail-label">信用等级</div>
+                                        <div class="risk-alert-detail-value">C级</div>
+                                    </div>
+                                    <div class="risk-alert-detail">
+                                        <div class="risk-alert-detail-label">逾期天数</div>
+                                        <div class="risk-alert-detail-value">120天</div>
+                                    </div>
+                                </div>
+                                <div class="risk-alert-actions">
+                                    <button class="btn btn-secondary btn-sm open-risk-analysis">查看详情</button>
+                                </div>
+                            </div>
+                            
+                            <div class="risk-alert-item medium">
+                                <div class="risk-alert-title">
+                                    <span>合肥格力 - 中风险预警</span>
+                                    <span class="risk-badge medium">B级</span>
+                                </div>
+                                <div class="risk-alert-description">
+                                    授信额度使用率高，接近警戒线，付款周期延长。
+                                </div>
+                                <div class="risk-alert-details">
+                                    <div class="risk-alert-detail">
+                                        <div class="risk-alert-detail-label">逾期金额</div>
+                                        <div class="risk-alert-detail-value">¥65,500</div>
+                                    </div>
+                                    <div class="risk-alert-detail">
+                                        <div class="risk-alert-detail-label">信用等级</div>
+                                        <div class="risk-alert-detail-value">B级</div>
+                                    </div>
+                                    <div class="risk-alert-detail">
+                                        <div class="risk-alert-detail-label">逾期天数</div>
+                                        <div class="risk-alert-detail-value">25天</div>
+                                    </div>
+                                </div>
+                                <div class="risk-alert-actions">
+                                    <button class="btn btn-secondary btn-sm open-risk-analysis">查看详情</button>
+                                </div>
+                            </div>
+                            
+                            <div class="risk-alert-item medium">
+                                <div class="risk-alert-title">
+                                    <span>武汉美的 - 中风险预警</span>
+                                    <span class="risk-badge medium">B级</span>
+                                </div>
+                                <div class="risk-alert-description">
+                                    最近一次回款有延迟，部分订单存在争议。
+                                </div>
+                                <div class="risk-alert-details">
+                                    <div class="risk-alert-detail">
+                                        <div class="risk-alert-detail-label">逾期金额</div>
+                                        <div class="risk-alert-detail-value">¥105,230</div>
+                                    </div>
+                                    <div class="risk-alert-detail">
+                                        <div class="risk-alert-detail-label">信用等级</div>
+                                        <div class="risk-alert-detail-value">B级</div>
+                                    </div>
+                                    <div class="risk-alert-detail">
+                                        <div class="risk-alert-detail-label">逾期天数</div>
+                                        <div class="risk-alert-detail-value">15天</div>
+                                    </div>
+                                </div>
+                                <div class="risk-alert-actions">
+                                    <button class="btn btn-secondary btn-sm open-risk-analysis">查看详情</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">订单风险监测</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="alert alert-danger">
+                            <i class="fas fa-ban"></i> 系统已自动拦截 <strong>2</strong> 个风险客户的发货申请，等待审核。
+                        </div>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>客户名称</th>
+                                    <th>订单号</th>
+                                    <th>订单金额</th>
+                                    <th>风险原因</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="risk-high">
+                                    <td>南京格力</td>
+                                    <td>ORD20230423001</td>
+                                    <td>¥185,000</td>
+                                    <td>逾期未结清，信用评级下降</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">审核</button>
+                                        <button class="btn btn-secondary btn-sm open-risk-analysis">详情</button>
+                                    </td>
+                                </tr>
+                                <tr class="risk-high">
+                                    <td>苏州美的</td>
+                                    <td>ORD20230422005</td>
+                                    <td>¥250,000</td>
+                                    <td>已超授信额度，存在支付风险</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">审核</button>
+                                        <button class="btn btn-secondary btn-sm open-risk-analysis">详情</button>
+                                    </td>
+                                </tr>
+                                <tr class="risk-medium">
+                                    <td>武汉美的</td>
+                                    <td>ORD20230420002</td>
+                                    <td>¥120,000</td>
+                                    <td>接近授信额度上限，需二次审核</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">审核</button>
+                                        <button class="btn btn-secondary btn-sm open-risk-analysis">详情</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 数据导入部分 -->
+            <div class="section" id="data-import-section">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">数据导入与整理</div>
+                        <button class="btn" id="importBtn">导入数据</button>
+                    </div>
+                    <div class="panel-body">
+                        <div class="tab-container">
+                            <div class="tabs">
+                                <div class="tab active" data-tab="import-data">导入数据</div>
+                                <div class="tab" data-tab="data-preview">数据预览</div>
+                                <div class="tab" data-tab="data-cleanup">数据清洗</div>
+                            </div>
+                            
+                            <div class="tab-content active" id="import-data-tab">
+                                <p>请上传您的客户数据 Excel 文件，系统将自动整理并导入数据。</p>
+                                <div style="margin-top: 20px;">
+                                    <button class="btn btn-secondary">选择文件</button>
+                                    <button class="btn btn-success" style="margin-left: 10px;">开始导入</button>
+                                </div>
+                                <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 6px;">
+                                    <p><strong>数据模板下载：</strong> <a href="#" style="color: #3498db; text-decoration: none;">点击下载</a></p>
+                                    <p style="margin-top: 10px; font-size: 14px; color: #7f8c8d;">
+                                        支持的文件格式：.xlsx, .xls<br>
+                                        数据导入后将自动进行校验和清洗，确保数据质量
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-content" id="data-preview-tab">
+                                <h3 style="margin-bottom: 15px;">数据预览</h3>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>客户名称</th>
+                                            <th>授信额度</th>
+                                            <th>已使用额度</th>
+                                            <th>应收账款</th>
+                                            <th>上次回款日期</th>
+                                            <th>月结天数</th>
+                                            <th>风险等级</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>芜湖格力</td>
+                                            <td>1,500.00</td>
+                                            <td>178.49</td>
+                                            <td>179.67</td>
+                                            <td>2025-03-17</td>
+                                            <td>30</td>
+                                            <td><span class="status-indicator status-active"></span> 低风险</td>
+                                        </tr>
+                                        <tr>
+                                            <td>武汉格力</td>
+                                            <td>1,500.00</td>
+                                            <td>2.17</td>
+                                            <td>2.17</td>
+                                            <td>2025-04-01</td>
+                                            <td>30</td>
+                                            <td><span class="status-indicator status-active"></span> 低风险</td>
+                                        </tr>
+                                        <tr class="risk-medium">
+                                            <td>合肥格力</td>
+                                            <td>1,500.00</td>
+                                            <td>16.97</td>
+                                            <td>16.97</td>
+                                            <td>2025-03-15</td>
+                                            <td>30</td>
+                                            <td><span class="status-indicator status-warning"></span> 中风险</td>
+                                        </tr>
+                                        <tr class="risk-high">
+                                            <td>南京格力</td>
+                                            <td>1,500.00</td>
+                                            <td>1.94</td>
+                                            <td>2.03</td>
+                                            <td>2025-02-28</td>
+                                            <td>30</td>
+                                            <td><span class="status-indicator status-danger"></span> 高风险</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="tab-content" id="data-cleanup-tab">
+                                <h3 style="margin-bottom: 15px;">数据清洗</h3>
+                                <p>系统已自动完成数据清洗，发现并修正了以下问题：</p>
+                                <ul style="margin-top: 10px; padding-left: 20px;">
+                                    <li>重复记录：3条（已删除）</li>
+                                    <li>格式错误：5处（已修正）</li>
+                                    <li>缺失值：8个（已标记）</li>
+                                </ul>
+                                <div style="margin-top: 20px;">
+                                    <button class="btn btn-success">确认并保存清洗后数据</button>
+                                    <button class="btn btn-secondary" style="margin-left: 10px;">查看详情</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">数据看板</div>
+                        <button class="btn" id="exportDataBtn">导出数据</button>
+                    </div>
+                    <div class="panel-body">
+                        <div class="data-board">
+                            <div class="board-card">
+                                <div class="board-card-title">总客户数</div>
+                                <div class="board-card-value">125</div>
+                            </div>
+                            <div class="board-card">
+                                <div class="board-card-title">A 级客户</div>
+                                <div class="board-card-value">32</div>
+                            </div>
+                            <div class="board-card">
+                                <div class="board-card-title">B 级客户</div>
+                                <div class="board-card-value">58</div>
+                            </div>
+                            <div class="board-card">
+                                <div class="board-card-title">高风险客户</div>
+                                <div class="board-card-value">15</div>
+                            </div>
+                            <div class="board-card">
+                                <div class="board-card-title">平均授信额度</div>
+                                <div class="board-card-value">856.32 万元</div>
+                            </div>
+                            <div class="board-card">
+                                <div class="board-card-title">平均应收账款</div>
+                                <div class="board-card-value">124.78 万元</div>
+                            </div>
+                            <div class="board-card">
+                                <div class="board-card-title">本月回款总额</div>
+                                <div class="board-card-value">2,356.78 万元</div>
+                            </div>
+                            <div class="board-card">
+                                <div class="board-card-title">逾期金额</div>
+                                <div class="board-card-value">432.56 万元</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 信用标准部分 -->
+            <div class="section" id="credit-standards-section">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">信用评级标准</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <div class="info-card-title">A 级 - 优质信用客户</div>
+                                <div class="info-card-value">信用评分：90-100 分</div>
+                                <p style="margin-top: 10px; font-size: 14px; color: #7f8c8d;">
+                                    授信额度使用率低于 50%，连续 12 个月内无逾期记录；<br>
+                                    上年度财报显示企业经营状况良好，盈利能力强。
+                                </p>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-card-title">B 级 - 良好信用客户</div>
+                                <div class="info-card-value">信用评分：75-89 分</div>
+                                <p style="margin-top: 10px; font-size: 14px; color: #7f8c8d;">
+                                    授信额度使用率在 50%-75% 之间，偶尔出现逾期（年累计不超过 2 次）；<br>
+                                    财务状况稳健，经营业绩稳定。
+                                </p>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-card-title">C 级 - 一般信用客户</div>
+                                <div class="info-card-value">信用评分：60-74 分</div>
+                                <p style="margin-top: 10px; font-size: 14px; color: #7f8c8d;">
+                                    授信额度使用率超过 75%，频繁逾期（年累计 3-5 次）；<br>
+                                    财务指标显示盈利能力较弱，存在一定经营风险。
+                                </p>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-card-title">D 级 - 风险信用客户</div>
+                                <div class="info-card-value">信用评分：0-59 分</div>
+                                <p style="margin-top: 10px; font-size: 14px; color: #7f8c8d;">
+                                    存在严重逾期（逾期超过 60 天或年累计超过 5 次）；<br>
+                                    财务状况恶化，出现连续亏损，面临债务危机。
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="credit-rating" style="margin-top: 30px;">
+                            <div class="rating-title">详细信用评级标准</div>
+                            <ul class="rating-criteria">
+                                <li>
+                                    <h4>A 级 - 优质信用客户</h4>
+                                    <p>授信额度使用率低于 50%，且连续 12 个月内无逾期记录；</p>
+                                    <p>上年度或季度财报显示企业经营状况良好，盈利能力强，资产负债率低于行业平均水平；</p>
+                                    <p>业务合作历史超过 2 年，与我司交易频繁且稳定增长，市场份额占比高；</p>
+                                    <p>行业地位突出，市场信誉卓越，属于行业龙头企业或具有较强市场竞争力的知名企业。</p>
+                                </li>
+                                <li>
+                                    <h4>B 级 - 良好信用客户</h4>
+                                    <p>授信额度使用率在 50%-75% 之间，偶尔出现逾期（年累计不超过 2 次，每次逾期天数在 30 天以内）；</p>
+                                    <p>财务状况较为稳健，资产负债率略高于行业平均但处于合理区间，经营业绩稳定；</p>
+                                    <p>合作时长在 1-2 年，交易规模逐年上升，具有一定的市场影响力和发展潜力；</p>
+                                    <p>所属行业前景广阔，企业自身在区域内具有一定知名度和客户基础。</p>
+                                </li>
+                                <li>
+                                    <h4>C 级 - 一般信用客户</h4>
+                                    <p>授信额度使用率超过 75%，频繁逾期（年累计逾期 3-5 次，逾期天数在 30-60 天之间）；</p>
+                                    <p>财务指标显示企业盈利能力较弱，资产负债率偏高，可能存在一定的经营风险；</p>
+                                    <p>合作时间较短（不足 1 年），交易不稳定，业务需求波动较大；</p>
+                                    <p>行业竞争力一般，市场知名度较低，属于中小企业或新兴企业。</p>
+                                </li>
+                                <li>
+                                    <h4>D 级 - 风险信用客户</h4>
+                                    <p>存在严重逾期（逾期天数超过 60 天，或年累计逾期超过 5 次），且经多次催收仍未回款；</p>
+                                    <p>财务状况恶化，出现连续亏损，资产负债率过高，面临债务危机或资不抵债风险；</p>
+                                    <p>业务合作出现重大违约行为，如擅自变更订单、拒绝收货等，严重影响我司利益；</p>
+                                    <p>所属行业处于衰退期，客户自身经营困难，存在破产风险。</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 模态框部分 -->
+    <!-- 客户详情模态框 -->
+    <div class="modal" id="customerDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">客户详情</div>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="customer-detail">
+                    <div class="customer-header">
+                        <div class="customer-name">芜湖格力</div>
+                        <div class="customer-risk risk-low">低风险</div>
+                    </div>
+                    
+                    <div class="customer-info">
+                        <div class="customer-info-item">
+                            <div class="customer-info-label">客户简称</div>
+                            <div class="customer-info-value">芜湖格力</div>
+                        </div>
+                        <div class="customer-info-item">
+                            <div class="customer-info-label">业务员</div>
+                            <div class="customer-info-value">胡祖祥</div>
+                        </div>
+                        <div class="customer-info-item">
+                            <div class="customer-info-label">授信额度</div>
+                            <div class="customer-info-value">1,500.00 万元</div>
+                        </div>
+                        <div class="customer-info-item">
+                            <div class="customer-info-label">已使用额度</div>
+                            <div class="customer-info-value">178.49 万元</div>
+                        </div>
+                        <div class="customer-info-item">
+                            <div class="customer-info-label">应收账款</div>
+                            <div class="customer-info-value">179.67 万元</div>
+                        </div>
+                        <div class="customer-info-item">
+                            <div class="customer-info-label">上次回款日期</div>
+                            <div class="customer-info-value">2025-03-17</div>
+                        </div>
+                        <div class="customer-info-item">
+                            <div class="customer-info-label">月结天数</div>
+                            <div class="customer-info-value">30 天</div>
+                        </div>
+                        <div class="customer-info-item">
+                            <div class="customer-info-label">付款方式</div>
+                            <div class="customer-info-value">6 个月银承</div>
+                        </div>
+                    </div>
+                    
+                    <div class="customer-timeline">
+                        <div class="timeline-title">交易历史</div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">2025-05-15</div>
+                            <div class="timeline-content">回款 22.57 万元，回款方式：6 个月银承</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">2025-03-17</div>
+                            <div class="timeline-content">回款 1.18 万元，回款方式：现汇</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">2025-02-20</div>
+                            <div class="timeline-content">新订单：订单号 20250220001，金额 50.00 万元</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">2025-01-15</div>
+                            <div class="timeline-content">发货：订单号 20250115001，金额 30.00 万元</div>
+                        </div>
+                    </div>
+                    
+                    <div class="credit-rating">
+                        <div class="rating-title">信用评级详情</div>
+                        <p style="margin-top: 10px; font-size: 14px; color: #7f8c8d;">
+                            芜湖格力属于 A 级优质信用客户。连续 12 个月内无逾期记录，授信额度使用率仅为 12%，财务状况良好，经营稳定。与我司合作超过 3 年，业务往来频繁且稳定增长，市场信誉卓越。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 风险分析模态框 -->
+    <div class="modal" id="riskAnalysisModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">风险分析 - <span id="risk-customer-name">客户名称</span> <span id="risk-customer-rating" class="risk-badge high">C级</span></div>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">授信情况</div>
+                    </div>
+                    <div class="flex-grid">
+                        <div class="flex-grid-col">
+                            <div class="info-card">
+                                <div class="info-card-title">授信额度</div>
+                                <div id="risk-credit-limit" class="info-card-value">¥1,500,000</div>
+                            </div>
+                        </div>
+                        <div class="flex-grid-col">
+                            <div class="info-card">
+                                <div class="info-card-title">已使用额度</div>
+                                <div id="risk-used-credit" class="info-card-value">¥1,425,000</div>
+                            </div>
+                        </div>
+                        <div class="flex-grid-col">
+                            <div class="info-card">
+                                <div class="info-card-title">应收账款</div>
+                                <div id="risk-receivable" class="info-card-value">¥1,520,500</div>
+                            </div>
+                        </div>
+                        <div class="flex-grid-col">
+                            <div class="info-card">
+                                <div class="info-card-title">逾期金额</div>
+                                <div id="risk-overdue" class="info-card-value" style="color: #e74c3c;">¥520,500</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="risk-analysis-tabs">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="risk-factors">风险因素</div>
+                        <div class="tab" data-tab="payment-history">回款历史</div>
+                        <div class="tab" data-tab="risk-trend">风险趋势</div>
+                        <div class="tab" data-tab="recommendations">建议措施</div>
+                    </div>
+                    
+                    <div class="tab-content active" id="risk-factors-tab">
+                        <div class="risk-factor">
+                            <div class="risk-factor-title">超额使用授信额度</div>
+                            <div class="risk-factor-body">
+                                <p>该客户的应收账款已超过授信额度，超额比例为1.3%。根据授信管理条例，客户应尽快清偿部分债务以将额度控制在授信范围内。</p>
+                            </div>
+                        </div>
+                        <div class="risk-factor">
+                            <div class="risk-factor-title">逾期付款情况恶化</div>
+                            <div class="risk-factor-body">
+                                <p>近三个月内连续出现逾期付款，且逾期时间从最初的7天延长至当前的45天，显示客户付款能力正在下降。</p>
+                            </div>
+                        </div>
+                        <div class="risk-factor">
+                            <div class="risk-factor-title">行业景气度下降</div>
+                            <div class="risk-factor-body">
+                                <p>客户所在的家电行业近期受到原材料价格上涨和消费低迷的双重冲击，行业整体利润率下滑，可能对客户的经营状况和付款能力产生不利影响。</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="payment-history-tab">
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="paymentHistoryChart"></canvas>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <h4>回款情况分析</h4>
+                            <p style="margin-top: 10px; color: #7f8c8d;">
+                                该客户在过去6个月中，有3次未按约定日期回款，逾期比例有上升趋势。从2022年11月开始，已使用信用额度明显增加，而回款金额未能相应增长，导致应收账款持续攀升。
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="risk-trend-tab">
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="riskTrendChartDetail"></canvas>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <h4>风险趋势分析</h4>
+                            <p style="margin-top: 10px; color: #7f8c8d;">
+                                该客户的信用评分已从6个月前的78分（B级）下降至当前的52分（C级），风险等级持续上升。主要原因是逾期付款次数增加、应收账款余额增长以及行业下行风险增加。若此趋势持续，可能在3个月内降至D级风险客户。
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="recommendations-tab">
+                        <div class="risk-factor">
+                            <div class="risk-factor-title">限制新增订单</div>
+                            <div class="risk-factor-body">
+                                <p>建议暂停接受该客户的新增订单，直至逾期账款得到清偿，应收账款降至授信额度以内。</p>
+                            </div>
+                        </div>
+                        <div class="risk-factor">
+                            <div class="risk-factor-title">提高付款条件</div>
+                            <div class="risk-factor-body">
+                                <p>对于必要的订单，建议要求提高预付款比例至50%，并收取一定比例的保证金，以降低回款风险。</p>
+                            </div>
+                        </div>
+                        <div class="risk-factor">
+                            <div class="risk-factor-title">启动催收程序</div>
+                            <div class="risk-factor-body">
+                                <p>指派专人负责催收逾期账款，必要时启动法务催收程序，以确保公司权益不受损害。</p>
+                            </div>
+                        </div>
+                        <div class="risk-factor">
+                            <div class="risk-factor-title">调整信用评级</div>
+                            <div class="risk-factor-body">
+                                <p>建议将该客户信用评级下调至C级，重新评估合作策略和授信情况，减少潜在风险敞口。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="recommendation-actions">
+                            <button class="btn btn-secondary">下载报告</button>
+                            <button class="btn btn-warning">启动法务处理</button>
+                            <button class="btn btn-primary">指派处理团队</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 风险预警模态框 -->
+    <div class="modal" id="riskWarningModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">风险预警</div>
+                <button class="close-btn close-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> 系统检测到以下客户存在风险情况，请及时处理
+                </div>
+                
+                <table style="margin-bottom: 20px;">
+                    <thead>
+                        <tr>
+                            <th>客户名称</th>
+                            <th>订单号</th>
+                            <th>订单金额</th>
+                            <th>风险原因</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>南京格力</td>
+                            <td>ORD20230423001</td>
+                            <td>¥185,000</td>
+                            <td>逾期未结清，信用评级下降</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm">审核</button>
+                                <button class="btn btn-secondary btn-sm">详情</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>苏州美的</td>
+                            <td>ORD20230422005</td>
+                            <td>¥250,000</td>
+                            <td>已超授信额度，存在支付风险</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm">审核</button>
+                                <button class="btn btn-secondary btn-sm">详情</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>武汉美的</td>
+                            <td>ORD20230420002</td>
+                            <td>¥120,000</td>
+                            <td>接近授信额度上限，需二次审核</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm">审核</button>
+                                <button class="btn btn-secondary btn-sm">详情</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button class="btn btn-secondary" id="viewAllRisksBtn">查看全部风险</button>
+                    <button class="btn btn-primary" id="processAllRisksBtn">批量处理</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 信用评级模态框 -->
+    <div class="modal" id="creditRatingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">信用评级标准</div>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="tabs">
+                    <div class="rating-tab active" data-rating="A">A级</div>
+                    <div class="rating-tab" data-rating="B">B级</div>
+                    <div class="rating-tab" data-rating="C">C级</div>
+                    <div class="rating-tab" data-rating="D">D级</div>
+                </div>
+                <div id="ratingContent" class="rating-content">
+                    <!-- 评级内容将通过JavaScript动态填充 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化导航
+            initNavigation();
+            
+            // 初始化标签页
+            initTabs();
+            
+            // 初始化图表
+            initCharts();
+            
+            // 初始化模态框
+            initModals();
+            
+            // 显示风险预警提示
+            setTimeout(() => {
+                showRiskWarnings();
+            }, 1000);
+        });
+        
+        // 初始化导航
+        function initNavigation() {
+            const navItems = document.querySelectorAll('.main-nav-item');
+            const sections = document.querySelectorAll('.section');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // 移除所有导航项的活动状态
+                    navItems.forEach(item => item.classList.remove('active'));
+                    
+                    // 为当前点击的导航项添加活动状态
+                    this.classList.add('active');
+                    
+                    // 获取目标部分ID
+                    const targetId = this.getAttribute('data-section') + '-section';
+                    
+                    // 隐藏所有部分
+                    sections.forEach(section => section.classList.remove('active'));
+                    
+                    // 显示目标部分
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+        }
+        
+        // 初始化标签页
+        function initTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // 获取父级元素
+                    const parentElement = this.closest('.tabs').parentElement;
+                    
+                    // 获取目标标签页ID
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // 移除同级标签页的活动状态
+                    const siblingTabs = parentElement.querySelectorAll('.tab');
+                    siblingTabs.forEach(t => t.classList.remove('active'));
+                    
+                    // 为当前点击的标签页添加活动状态
+                    this.classList.add('active');
+                    
+                    // 隐藏所有内容
+                    const tabContents = parentElement.querySelectorAll('.tab-content');
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // 显示目标内容
+                    const targetContent = parentElement.querySelector(`#${tabId}-tab`);
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    }
+                });
+            });
+        }
+        
+        // 初始化图表
+        function initCharts() {
+            // 风险分布图表
+            const riskChartCtx = document.getElementById('riskChart');
+            if (riskChartCtx) {
+                new Chart(riskChartCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['低风险(A级)', '中风险(B级)', '高风险(C级)', '极高风险(D级)'],
+                        datasets: [{
+                            data: [42, 56, 18, 12],
+                            backgroundColor: ['#4cd964', '#ffcc00', '#ff9500', '#ff3b30'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 15,
+                                    padding: 15
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.raw || 0;
+                                        const total = context.dataset.data.reduce((acc, data) => acc + data, 0);
+                                        const percentage = Math.round((value / total) * 100);
+                                        return `${label}: ${value} 客户 (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 授信使用分析图表
+            const creditChartCtx = document.getElementById('creditUseChart');
+            if (creditChartCtx) {
+                new Chart(creditChartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['1月', '2月', '3月', '4月'],
+                        datasets: [{
+                            label: '授信使用',
+                            data: [62, 58, 65, 71],
+                            backgroundColor: 'rgba(0, 122, 255, 0.7)',
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `授信使用率: ${context.raw}%`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 客户集中度分析图表
+            const customerConcentrationCtx = document.getElementById('customerConcentrationChart');
+            if (customerConcentrationCtx) {
+                new Chart(customerConcentrationCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['前5大客户', '其他客户'],
+                        datasets: [{
+                            data: [65, 35],
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.7)',
+                                'rgba(54, 162, 235, 0.7)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    boxWidth: 12,
+                                    padding: 10,
+                                    font: {
+                                        size: 10
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 账款回收趋势图表
+            const paymentTrendCtx = document.getElementById('paymentTrendChart');
+            if (paymentTrendCtx) {
+                new Chart(paymentTrendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1月', '2月', '3月', '4月', '5月'],
+                        datasets: [{
+                            label: '回款率',
+                            data: [92, 94, 90, 87, 85],
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                min: 80,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 信用风险趋势图表
+            const riskTrendCtx = document.getElementById('riskTrendChart');
+            if (riskTrendCtx) {
+                new Chart(riskTrendCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['1月', '2月', '3月', '4月', '5月'],
+                        datasets: [{
+                            label: 'C/D级客户占比',
+                            data: [15, 18, 20, 22, 24],
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 30,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 行业分布图表
+            const industryDistributionCtx = document.getElementById('industryDistributionChart');
+            if (industryDistributionCtx) {
+                new Chart(industryDistributionCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['家电行业', '电子产品', '工业应用', '其他'],
+                        datasets: [{
+                            data: [72, 15, 8, 5],
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 0.7)',
+                                'rgba(255, 206, 86, 0.7)',
+                                'rgba(75, 192, 192, 0.7)',
+                                'rgba(153, 102, 255, 0.7)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    boxWidth: 12,
+                                    padding: 8,
+                                    font: {
+                                        size: 10
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // 初始化模态框
+        function initModals() {
+            // 打开客户详情模态框按钮
+            const customerDetailButtons = document.querySelectorAll('.open-customer-detail');
+            customerDetailButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const customerName = row.querySelector('td:first-child').textContent;
+                    showCustomerDetail(customerName);
+                });
+            });
+            
+            // 打开风险分析模态框按钮
+            const riskAnalysisButtons = document.querySelectorAll('.open-risk-analysis');
+            riskAnalysisButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const item = this.closest('.risk-alert-item') || this.closest('tr');
+                    let customerName, riskLevel, overdueAmount, creditRating;
+                    
+                    if (item.classList.contains('risk-alert-item')) {
+                        const titleElem = item.querySelector('.risk-alert-title span');
+                        const customerInfo = titleElem.textContent.split(' - ');
+                        customerName = customerInfo[0];
+                        riskLevel = customerInfo[1];
+                        
+                        overdueAmount = item.querySelector('.risk-alert-detail-value').textContent;
+                        creditRating = item.querySelectorAll('.risk-alert-detail-value')[1].textContent;
+                    } else {
+                        customerName = item.querySelector('td:first-child').textContent;
+                        riskLevel = '高风险预警';
+                        overdueAmount = '¥未知';
+                        creditRating = item.querySelector('.risk-badge') ? 
+                                        item.querySelector('.risk-badge').textContent : 'C级';
+                    }
+                    
+                    showRiskAnalysisModal(customerName, riskLevel, overdueAmount, creditRating);
+                });
+            });
+            
+            // 关闭模态框按钮
+            const closeButtons = document.querySelectorAll('.modal .close-btn');
+            closeButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    closeModal(modal);
+                });
+            });
+            
+            // 模态框背景点击关闭
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal(this);
+                    }
+                });
+            });
+            
+            // 绑定信用评级按钮事件
+            const creditRatingBtn = document.getElementById('creditRatingBtn');
+            if (creditRatingBtn) {
+                creditRatingBtn.addEventListener('click', function() {
+                    showCreditRatingCriteria();
+                });
+            }
+            
+            // 绑定导出报告按钮事件
+            const exportBtns = document.querySelectorAll('#exportRiskBtn, #exportDataBtn, #generateReportBtn');
+            exportBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showNotification('报告生成中，请稍候...', 'info');
+                    setTimeout(() => {
+                        showNotification('报告已生成并下载完成', 'success');
+                    }, 1500);
+                });
+            });
+            
+            // 绑定批量处理按钮事件
+            const batchProcessBtn = document.getElementById('processAllRisksBtn');
+            if (batchProcessBtn) {
+                batchProcessBtn.addEventListener('click', function() {
+                    showNotification('正在将风险事项分配至相关部门...', 'info');
+                    setTimeout(() => {
+                        showNotification('风险事项已成功分配至相关部门处理', 'success');
+                    }, 1500);
+                });
+            }
+        }
+        
+        // 显示客户详情
+        function showCustomerDetail(customerName) {
+            const modal = document.getElementById('customerDetailModal');
+            if (!modal) return;
+            
+            // 设置客户名称
+            const nameElem = modal.querySelector('.customer-name');
+            if (nameElem) {
+                nameElem.textContent = customerName;
+            }
+            
+            // 设置标题
+            const titleElem = modal.querySelector('#modalTitle');
+            if (titleElem) {
+                titleElem.textContent = `客户详情 - ${customerName}`;
+            }
+            
+            // 打开模态框
+            openModal(modal);
+        }
+        
+        // 显示风险分析模态框
+        function showRiskAnalysisModal(customerName, riskLevel, overdueAmount, creditRating) {
+            const modal = document.getElementById('riskAnalysisModal');
+            if (!modal) return;
+            
+            // 设置客户信息
+            document.getElementById('risk-customer-name').textContent = customerName;
+            const ratingElem = document.getElementById('risk-customer-rating');
+            ratingElem.textContent = creditRating;
+            
+            // 设置风险等级样式
+            ratingElem.className = 'risk-badge';
+            if (creditRating === 'A级') {
+                ratingElem.classList.add('low');
+            } else if (creditRating === 'B级') {
+                ratingElem.classList.add('medium');
+            } else if (creditRating === 'C级') {
+                ratingElem.classList.add('high');
+            } else if (creditRating === 'D级') {
+                ratingElem.classList.add('extreme');
+            }
+            
+            // 设置逾期金额
+            document.getElementById('risk-overdue').textContent = overdueAmount;
+            
+            // 初始化风险分析图表
+            initRiskAnalysisCharts(customerName);
+            
+            // 打开模态框
+            openModal(modal);
+        }
+        
+        // 初始化风险分析图表
+        function initRiskAnalysisCharts(customerName) {
+            // 获取客户数据
+            const customerData = getCustomerRiskData(customerName);
+            
+            // 初始化回款历史图表
+            const paymentHistoryChartCtx = document.getElementById('paymentHistoryChart');
+            if (paymentHistoryChartCtx) {
+                // 清除现有图表
+                if (window.paymentHistoryChart) {
+                    window.paymentHistoryChart.destroy();
+                }
+                
+                // 创建新图表
+                window.paymentHistoryChart = new Chart(paymentHistoryChartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: customerData.paymentHistory.months,
+                        datasets: [
+                            {
+                                label: '订单金额',
+                                data: customerData.paymentHistory.orderAmounts,
+                                backgroundColor: 'rgba(0, 122, 255, 0.7)',
+                                borderColor: 'rgba(0, 122, 255, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: '回款金额',
+                                data: customerData.paymentHistory.paymentAmounts,
+                                backgroundColor: 'rgba(76, 217, 100, 0.7)',
+                                borderColor: 'rgba(76, 217, 100, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '¥' + formatNumber(value);
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        let value = context.raw || 0;
+                                        return label + ': ¥' + formatNumber(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 初始化风险趋势图表
+            const riskTrendChartCtx = document.getElementById('riskTrendChartDetail');
+            if (riskTrendChartCtx) {
+                // 清除现有图表
+                if (window.riskTrendChartDetail) {
+                    window.riskTrendChartDetail.destroy();
+                }
+                
+                // 创建新图表
+                window.riskTrendChartDetail = new Chart(riskTrendChartCtx, {
+                    type: 'line',
+                    data: {
+                        labels: customerData.riskTrend.months,
+                        datasets: [
+                            {
+                                label: '信用评分趋势',
+                                data: customerData.riskTrend.scores,
+                                borderColor: 'rgba(255, 59, 48, 1)',
+                                backgroundColor: 'rgba(255, 59, 48, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                min: 0,
+                                max: 100,
+                                reverse: false,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '分';
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const score = context.raw;
+                                        let ratingLabel = '未知';
+                                        
+                                        if (score >= 80) ratingLabel = 'A级(低风险)';
+                                        else if (score >= 60) ratingLabel = 'B级(中风险)';
+                                        else if (score >= 40) ratingLabel = 'C级(高风险)';
+                                        else ratingLabel = 'D级(极高风险)';
+                                        
+                                        return `评分: ${score}分 (${ratingLabel})`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // 获取客户风险数据（模拟数据）
+        function getCustomerRiskData(customerName) {
+            const riskData = {
+                '南京格力': {
+                    creditLimit: 1500000,
+                    usedCredit: 1425000,
+                    receivable: 1520500,
+                    paymentHistory: {
+                        months: ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02'],
+                        orderAmounts: [30000, 45000, 35000, 50000, 30000, 1940],
+                        paymentAmounts: [30000, 45000, 35000, 50000, 28000, 0]
+                    },
+                    riskTrend: {
+                        months: ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02'],
+                        scores: [78, 75, 72, 68, 59, 52]
+                    }
+                },
+                '苏州美的': {
+                    creditLimit: 1000000,
+                    usedCredit: 1250800,
+                    receivable: 1250800,
+                    paymentHistory: {
+                        months: ['2022-08', '2022-09', '2022-10', '2022-11', '2022-12', '2023-01'],
+                        orderAmounts: [120000, 150000, 200000, 350000, 430800, 0],
+                        paymentAmounts: [120000, 150000, 180000, 0, 0, 0]
+                    },
+                    riskTrend: {
+                        months: ['2022-08', '2022-09', '2022-10', '2022-11', '2022-12', '2023-01'],
+                        scores: [72, 65, 58, 42, 31, 25]
+                    }
+                },
+                '武汉美的': {
+                    creditLimit: 1200000,
+                    usedCredit: 890450,
+                    receivable: 905230,
+                    paymentHistory: {
+                        months: ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02'],
+                        orderAmounts: [95000, 120000, 75000, 110000, 890450, 0],
+                        paymentAmounts: [95000, 120000, 75000, 60000, 0, 0]
+                    },
+                    riskTrend: {
+                        months: ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02'],
+                        scores: [68, 63, 55, 48, 40, 33]
+                    }
+                },
+                '合肥格力': {
+                    creditLimit: 1500000,
+                    usedCredit: 950000,
+                    receivable: 965500,
+                    paymentHistory: {
+                        months: ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02'],
+                        orderAmounts: [35000, 28000, 42000, 38000, 25000, 16970],
+                        paymentAmounts: [35000, 28000, 42000, 38000, 25000, 0]
+                    },
+                    riskTrend: {
+                        months: ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02'],
+                        scores: [85, 83, 80, 76, 72, 68]
+                    }
+                }
+            };
+            
+            // 如果没有特定客户的数据，返回默认数据
+            return riskData[customerName] || {
+                creditLimit: 1000000,
+                usedCredit: 500000,
+                receivable: 520000,
+                paymentHistory: {
+                    months: ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02'],
+                    orderAmounts: [80000, 90000, 85000, 95000, 100000, 0],
+                    paymentAmounts: [80000, 90000, 85000, 95000, 50000, 0]
+                },
+                riskTrend: {
+                    months: ['2022-09', '2022-10', '2022-11', '2022-12', '2023-01', '2023-02'],
+                    scores: [75, 72, 68, 65, 60, 55]
+                }
+            };
+        }
+        
+        // 显示信用评级标准
+        function showCreditRatingCriteria() {
+            const modal = document.getElementById('creditRatingModal');
+            if (!modal) return;
+            
+            // 初始化评级内容
+            updateRatingContent('A');
+            
+            // 绑定评级标签点击事件
+            const ratingTabs = modal.querySelectorAll('.rating-tab');
+            ratingTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const rating = this.getAttribute('data-rating');
+                    
+                    // 更新标签状态
+                    ratingTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 更新内容
+                    updateRatingContent(rating);
+                });
+            });
+            
+            // 显示模态框
+            openModal(modal);
+        }
+        
+        // 更新评级内容
+        function updateRatingContent(rating) {
+            const contentElement = document.getElementById('ratingContent');
+            if (!contentElement) return;
+            
+            // 评级内容
+            const ratingContents = {
+                'A': {
+                    title: 'A级（优质信用客户）',
+                    description: '超强的财务实力和优秀的付款历史，几乎没有任何信用风险。',
+                    criteria: [
+                        { name: '付款历史', details: ['从不逾期或逾期不超过3天', '过去12个月内始终保持良好的付款记录'] },
+                        { name: '财务状况', details: ['稳定增长的营业收入', '较高的利润率', '充足的现金流'] },
+                        { name: '业务规模', details: ['行业领先企业', '市场份额稳定或增长', '业务多元化'] },
+                        { name: '合作关系', details: ['长期稳定的合作关系（3年以上）', '订单频率高且稳定'] }
+                    ]
+                },
+                'B': {
+                    title: 'B级（良好信用客户）',
+                    description: '良好的财务实力和付款历史，信用风险较低。',
+                    criteria: [
+                        { name: '付款历史', details: ['偶尔逾期（不超过7天）', '过去12个月内逾期次数不超过3次'] },
+                        { name: '财务状况', details: ['稳定的营业收入', '行业平均利润率', '足够的现金流'] },
+                        { name: '业务规模', details: ['行业内知名企业', '市场份额稳定', '业务相对集中'] },
+                        { name: '合作关系', details: ['稳定的合作关系（1-3年）', '订单频率较高'] }
+                    ]
+                },
+                'C': {
+                    title: 'C级（一般信用客户）',
+                    description: '一般财务实力和不稳定的付款历史，存在一定信用风险。',
+                    criteria: [
+                        { name: '付款历史', details: ['经常逾期（7-30天）', '过去12个月内有多次逾期记录'] },
+                        { name: '财务状况', details: ['营业收入波动', '低于行业平均利润率', '现金流偏紧'] },
+                        { name: '业务规模', details: ['行业内一般企业', '市场份额不稳定', '业务单一'] },
+                        { name: '合作关系', details: ['较短的合作关系（不足1年）', '订单频率不稳定'] }
+                    ]
+                },
+                'D': {
+                    title: 'D级（风险信用客户）',
+                    description: '较弱的财务实力和较差的付款历史，信用风险较高。',
+                    criteria: [
+                        { name: '付款历史', details: ['长期逾期（超过30天）', '过去12个月内有多次严重逾期'] },
+                        { name: '财务状况', details: ['营业收入下降', '持续亏损', '现金流紧张'] },
+                        { name: '业务规模', details: ['行业内较小企业', '市场份额下降', '业务单一且不稳定'] },
+                        { name: '合作关系', details: ['新客户或合作关系不稳定', '订单频率低且不稳定'] }
+                    ]
+                }
+            };
+            
+            const content = ratingContents[rating];
+            
+            // 生成HTML内容
+            let html = `
+                <div class="rating-header">
+                    <h3>${content.title}</h3>
+                    <p class="rating-description">${content.description}</p>
+                </div>
+                <div class="rating-criteria">
+            `;
+            
+            content.criteria.forEach(criterion => {
+                html += `
+                    <div class="criterion-group">
+                        <h4 class="criterion-title">${criterion.name}</h4>
+                        <ul class="criterion-list">
+                `;
+                
+                criterion.details.forEach(detail => {
+                    html += `<li>${detail}</li>`;
+                });
+                
+                html += `
+                        </ul>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            
+            contentElement.innerHTML = html;
+        }
+        
+        // 显示风险预警提示
+        function showRiskWarnings() {
+            // 显示高风险客户订单提示
+            showNotification('⚠️ 发现3个高风险客户新订单，请立即处理！', 'warning', 5000);
+            
+            // 显示仓库拦截货物提示
+            setTimeout(() => {
+                showNotification('🛑 系统已自动拦截2个风险客户的发货申请，等待审核', 'error', 5000);
+            }, 1500);
+            
+            // 显示风险预警模态框
+            setTimeout(() => {
+                const modal = document.getElementById('riskWarningModal');
+                if (modal) {
+                    openModal(modal);
+                }
+            }, 3000);
+        }
+        
+        // 打开模态框
+        function openModal(modal) {
+            if (modal) {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        // 关闭模态框
+        function closeModal(modal) {
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // 显示通知
+        function showNotification(message, type = 'info', duration = 3000) {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.className = 'notification ' + type;
+            
+            // 添加图标
+            let icon = '';
+            switch(type) {
+                case 'success':
+                    icon = '<i class="fas fa-check-circle"></i>';
+                    break;
+                case 'error':
+                    icon = '<i class="fas fa-exclamation-circle"></i>';
+                    break;
+                case 'warning':
+                    icon = '<i class="fas fa-exclamation-triangle"></i>';
+                    break;
+                default:
+                    icon = '<i class="fas fa-info-circle"></i>';
+            }
+            
+            // 设置内容
+            notification.innerHTML = `${icon} <span>${message}</span>`;
+            
+            // 添加到页面
+            document.body.appendChild(notification);
+            
+            // 显示通知
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateY(0)';
+            }, 10);
+            
+            // 自动关闭
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(-20px)';
+                
+                // 移除元素
+                setTimeout(() => {
+                    notification.parentNode.removeChild(notification);
+                }, 300);
+            }, duration);
+        }
+        
+        // 格式化数字（添加千分位）
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    </script>
+</body>
+</html> 

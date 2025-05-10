@@ -1,0 +1,578 @@
+/**
+ * 客户信用风险管控系统
+ * 组件样式文件
+ */
+
+/* 通知样式 */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 300px;
+    padding: 16px 20px;
+    background-color: white;
+    border-left: 4px solid #007aff;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-20px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+}
+
+.notification i {
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+.notification.success {
+    border-color: #4cd964;
+}
+
+.notification.success i {
+    color: #4cd964;
+}
+
+.notification.error {
+    border-color: #ff3b30;
+}
+
+.notification.error i {
+    color: #ff3b30;
+}
+
+.notification.warning {
+    border-color: #ffcc00;
+}
+
+.notification.warning i {
+    color: #ffcc00;
+}
+
+.notification.info i {
+    color: #007aff;
+}
+
+/* 模态框样式 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: var(--radius-md);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(20px);
+    transition: transform 0.3s;
+}
+
+.modal.show .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: var(--danger-red);
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* 警告类型模态框 */
+.modal-content.warning .modal-header {
+    background-color: var(--warning-yellow);
+    color: #fff;
+}
+
+.modal-content.danger .modal-header {
+    background-color: var(--danger-red);
+    color: #fff;
+}
+
+/* 加载中动画 */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--primary-blue);
+    animation: spin 1s linear infinite;
+}
+
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* 表单样式 */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    border-color: var(--primary-blue);
+    outline: none;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* 标签页样式 */
+.tab-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 15px;
+}
+
+.tab {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.tab.active {
+    border-bottom-color: var(--primary-blue);
+    color: var(--primary-blue);
+    font-weight: 500;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* 徽章样式 */
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.badge-primary {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+.badge-success {
+    background-color: var(--success-green);
+    color: white;
+}
+
+.badge-warning {
+    background-color: var(--warning-yellow);
+    color: white;
+}
+
+.badge-danger {
+    background-color: var(--danger-red);
+    color: white;
+}
+
+/* 下拉菜单样式 */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-trigger {
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    min-width: 150px;
+    background-color: white;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
+    padding: 5px 0;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.2s;
+}
+
+.dropdown.active .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+.dropdown-divider {
+    height: 1px;
+    margin: 5px 0;
+    background-color: var(--border-color);
+}
+
+/* 确认弹窗 */
+.confirm-dialog {
+    background-color: white;
+    border-radius: var(--radius-md);
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    box-shadow: var(--shadow-lg);
+}
+
+.confirm-dialog-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.confirm-dialog-message {
+    margin-bottom: 20px;
+    color: var(--text-secondary);
+}
+
+.confirm-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* 微信小程序导航样式 */
+.wechat-mini-program .top-nav {
+    padding: 10px 0;
+    padding-top: 40px; /* 为状态栏留出空间 */
+}
+
+.mini-program-nav {
+    background-color: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.mini-program-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.05);
+    margin-left: 10px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+.mini-program-back i {
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.nav-item-disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .wechat-mini-program .top-nav {
+        padding-top: 30px;
+    }
+    
+    .wechat-mini-program .nav-items {
+        gap: 5px;
+    }
+    
+    .wechat-mini-program .nav-item {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .wechat-mini-program .nav-profile {
+        margin-left: 5px;
+    }
+    
+    .wechat-mini-program .avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 0.9rem;
+    }
+}
+
+/* 风险预警模态框样式 */
+.risk-modal .modal-header {
+    background-color: #ffcc00;
+    color: #333;
+}
+
+.risk-modal .modal-header.warning {
+    background-color: #ff9500;
+    color: white;
+}
+
+.risk-modal .modal-header i {
+    margin-right: 10px;
+}
+
+.risk-alert-message {
+    background-color: #fff9e6;
+    border-left: 4px solid #ffcc00;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.risk-alert-section {
+    margin-bottom: 24px;
+}
+
+.risk-alert-section h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+.risk-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+}
+
+.risk-table th {
+    background-color: #f5f5f5;
+    text-align: left;
+    padding: 10px 12px;
+    font-weight: 500;
+    font-size: 14px;
+    color: #555;
+}
+
+.risk-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.btn-small {
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-right: 5px;
+}
+
+.approve-btn {
+    background-color: #4cd964;
+    color: white;
+}
+
+.approve-btn:hover {
+    background-color: #41b956;
+}
+
+.reject-btn {
+    background-color: #ff3b30;
+    color: white;
+}
+
+.reject-btn:hover {
+    background-color: #e0352b;
+}
+
+.adjust-btn {
+    background-color: #007aff;
+    color: white;
+}
+
+.adjust-btn:hover {
+    background-color: #0066d6;
+}
+
+/* 客户业务往来分析样式 */
+.business-history-section {
+    margin-top: 20px;
+}
+
+.business-summary {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background-color: var(--background-light);
+    padding: 15px;
+}
+
+.business-stat {
+    text-align: center;
+    padding: 0 15px;
+    border-right: 1px solid var(--border-color);
+    flex: 1;
+}
+
+.business-stat:last-child {
+    border-right: none;
+}
+
+.business-stat-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--primary-blue);
+    margin-bottom: 5px;
+}
+
+.business-stat-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.business-year-trend {
+    margin-top: 20px;
+}
+
+.trend-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.trend-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.trend-control {
+    padding: 4px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 12px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.trend-control.active {
+    background-color: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+}
+
+.business-chart-container {
+    height: 250px;
+} 

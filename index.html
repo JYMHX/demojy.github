@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信用分析仪表盘 - 客户信用管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="credit-rating.css">
+    <link rel="stylesheet" href="components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 统一导航栏 -->
+        <nav class="top-nav">
+            <div class="nav-brand">信用管理系统</div>
+            <div class="nav-items">
+                <a href="index.html" class="nav-item active">仪表盘</a>
+                <a href="data-import.html" class="nav-item">数据导入</a>
+                <a href="customer-management.html" class="nav-item">客户管理</a>
+                <a href="risk-monitor.html" class="nav-item">风险监控</a>
+            </div>
+            <div class="nav-profile">
+                <span class="user-name">管理员</span>
+                <div class="avatar">A</div>
+            </div>
+        </nav>
+
+        <div class="main-content">
+            <!-- 主内容区 -->
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <div class="analysis-controls">
+                        <select class="time-range-select" id="timeRange">
+                            <option value="month">本月</option>
+                            <option value="quarter">本季度</option>
+                            <option value="year">本年</option>
+                        </select>
+                        <button class="btn-refresh">
+                            <i class="fas fa-sync-alt"></i> 刷新数据
+                        </button>
+                    </div>
+                    <h1 class="page-title">信用分析仪表盘</h1>
+                    <div class="page-actions">
+                        <button class="btn-primary" id="generateReportBtn">
+                            <i class="fas fa-file-pdf"></i> 生成报告
+                        </button>
+                        <button class="btn-secondary">
+                            <i class="fas fa-download"></i> 导出数据
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 数据概览卡片 -->
+                <div class="dashboard-cards">
+                    <div class="card summary-card">
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">客户总数</h3>
+                            <p class="card-value">128</p>
+                            <p class="card-trend positive">+3.2% <span>较上月</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="card summary-card">
+                        <div class="card-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">总授信额度</h3>
+                            <p class="card-value">¥1,920,000</p>
+                            <p class="card-trend positive">+5.7% <span>较上月</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="card summary-card">
+                        <div class="card-icon warning">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">风险客户</h3>
+                            <p class="card-value">12</p>
+                            <p class="card-trend negative">+2 <span>较上月</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="card summary-card">
+                        <div class="card-icon danger">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">逾期金额</h3>
+                            <p class="card-value">¥85,230</p>
+                            <p class="card-trend negative">+12.3% <span>较上月</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 风险分布图表 -->
+                <div class="dashboard-row">
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3 class="card-title">客户风险分布</h3>
+                            <div class="card-actions">
+                                <select class="time-filter">
+                                    <option>本月</option>
+                                    <option>本季度</option>
+                                    <option>本年度</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="riskChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3 class="card-title">逾期账龄分析</h3>
+                            <div class="card-actions">
+                                <button class="btn-icon">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="aging-bars">
+                                <div class="aging-item">
+                                    <div class="aging-label">30天内</div>
+                                    <div class="aging-bar-container">
+                                        <div class="aging-bar" style="width: 65%;"></div>
+                                        <div class="aging-value">¥42,500</div>
+                                    </div>
+                                </div>
+                                <div class="aging-item">
+                                    <div class="aging-label">30-60天</div>
+                                    <div class="aging-bar-container">
+                                        <div class="aging-bar warning" style="width: 25%;"></div>
+                                        <div class="aging-value">¥21,300</div>
+                                    </div>
+                                </div>
+                                <div class="aging-item">
+                                    <div class="aging-label">60-90天</div>
+                                    <div class="aging-bar-container">
+                                        <div class="aging-bar danger" style="width: 15%;"></div>
+                                        <div class="aging-value">¥12,780</div>
+                                    </div>
+                                </div>
+                                <div class="aging-item">
+                                    <div class="aging-label">90天以上</div>
+                                    <div class="aging-bar-container">
+                                        <div class="aging-bar high-danger" style="width: 10%;"></div>
+                                        <div class="aging-value">¥8,650</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 信用评级统计 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">信用评级统计</h3>
+                        <div class="card-actions">
+                            <button class="btn-primary" id="viewRatingCriteriaBtn">
+                                <i class="fas fa-info-circle"></i> 评级标准
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="rating-stats">
+                            <div class="rating-stat-card a-level">
+                                <div class="rating-stat-title">A级客户</div>
+                                <div class="rating-stat-value">42</div>
+                                <div class="rating-stat-percent">32.8%</div>
+                            </div>
+                            <div class="rating-stat-card b-level">
+                                <div class="rating-stat-title">B级客户</div>
+                                <div class="rating-stat-value">56</div>
+                                <div class="rating-stat-percent">43.8%</div>
+                            </div>
+                            <div class="rating-stat-card c-level">
+                                <div class="rating-stat-title">C级客户</div>
+                                <div class="rating-stat-value">18</div>
+                                <div class="rating-stat-percent">14.1%</div>
+                            </div>
+                            <div class="rating-stat-card d-level">
+                                <div class="rating-stat-title">D级客户</div>
+                                <div class="rating-stat-value">12</div>
+                                <div class="rating-stat-percent">9.3%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 在信用评级统计卡片后添加数据分析摘要部分 -->
+                <div class="dashboard-row">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">业务数据总结分析</h3>
+                            <div class="card-actions">
+                                <button class="btn-primary" id="viewDetailAnalysisBtn">
+                                    <i class="fas fa-chart-line"></i> 详细分析
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="analysis-summary">
+                                <div class="analysis-card">
+                                    <div class="analysis-title">
+                                        <i class="fas fa-chart-pie"></i>
+                                        <span>客户集中度分析</span>
+                                    </div>
+                                    <div class="analysis-content">
+                                        <div class="analysis-chart-mini">
+                                            <canvas id="customerConcentrationChart"></canvas>
+                                        </div>
+                                        <div class="analysis-text">
+                                            <p class="analysis-highlight">前5大客户占总销售额的65%</p>
+                                            <p>客户集中度较高，建议扩展客户群体，降低风险</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="analysis-card">
+                                    <div class="analysis-title">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                        <span>账款回收趋势</span>
+                                    </div>
+                                    <div class="analysis-content">
+                                        <div class="analysis-chart-mini">
+                                            <canvas id="paymentTrendChart"></canvas>
+                                        </div>
+                                        <div class="analysis-text">
+                                            <p class="analysis-highlight">季度回款率下降5.3%</p>
+                                            <p>C/D级客户回款延迟增加，需加强账款管理</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="analysis-card">
+                                    <div class="analysis-title">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>信用风险趋势</span>
+                                    </div>
+                                    <div class="analysis-content">
+                                        <div class="analysis-chart-mini">
+                                            <canvas id="riskTrendChart"></canvas>
+                                        </div>
+                                        <div class="analysis-text">
+                                            <p class="analysis-highlight">高风险客户增加23.5%</p>
+                                            <p>建议调整授信策略，优化客户结构</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="analysis-card">
+                                    <div class="analysis-title">
+                                        <i class="fas fa-industry"></i>
+                                        <span>行业分布</span>
+                                    </div>
+                                    <div class="analysis-content">
+                                        <div class="analysis-chart-mini">
+                                            <canvas id="industryDistributionChart"></canvas>
+                                        </div>
+                                        <div class="analysis-text">
+                                            <p class="analysis-highlight">家电行业占比达72%</p>
+                                            <p>行业集中度高，建议拓展多元化市场</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="analysis-actions">
+                                <div class="analysis-recommendation">
+                                    <h4><i class="fas fa-lightbulb"></i> 系统建议</h4>
+                                    <ul>
+                                        <li>针对武汉美的等高风险客户，建议降低授信额度并要求现款支付</li>
+                                        <li>对南京格力等账期延长的客户，建议进行账款催收并临时冻结授信</li>
+                                        <li>考虑开拓新行业客户，降低单一行业依赖风险</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 客户数据表格 -->
+                <div class="card table-card">
+                    <div class="card-header">
+                        <h3 class="card-title">客户信用状况</h3>
+                        <div class="card-actions">
+                            <div class="search-container">
+                                <input type="text" class="search-input" placeholder="搜索客户...">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <button class="btn-primary add-customer-btn">
+                                <i class="fas fa-plus"></i> 添加客户
+                            </button>
+                            <button class="btn-primary">
+                                <i class="fas fa-filter"></i> 筛选
+                            </button>
+                            <button class="btn-primary export-data-btn">
+                                <i class="fas fa-download"></i> 导出
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="data-table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th data-sort="name">客户名称 <i class="fas fa-sort-down"></i></th>
+                                        <th data-sort="credit">授信额度</th>
+                                        <th data-sort="used">已用额度</th>
+                                        <th data-sort="receivable">应收账款</th>
+                                        <th data-sort="lastPayment">上次回款</th>
+                                        <th data-sort="terms">月结天数</th>
+                                        <th data-sort="risk">信用评级</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="risk-low" data-customer-id="1">
+                                        <td>芜湖格力</td>
+                                        <td>¥1,500,000</td>
+                                        <td>¥178,490</td>
+                                        <td>¥179,670</td>
+                                        <td>2023-03-17</td>
+                                        <td>30</td>
+                                        <td>
+                                            <span class="risk-badge low">A级</span>
+                                            <button class="rating-detail-btn" data-rating="A">详情</button>
+                                        </td>
+                                        <td>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="rating-adjust-btn" data-customer-id="1" data-current-rating="A">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="risk-low" data-customer-id="2">
+                                        <td>武汉格力</td>
+                                        <td>¥1,500,000</td>
+                                        <td>¥2,170</td>
+                                        <td>¥2,170</td>
+                                        <td>2023-04-01</td>
+                                        <td>30</td>
+                                        <td>
+                                            <span class="risk-badge low">A级</span>
+                                            <button class="rating-detail-btn" data-rating="A">详情</button>
+                                        </td>
+                                        <td>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="rating-adjust-btn" data-customer-id="2" data-current-rating="A">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="risk-medium" data-customer-id="3">
+                                        <td>合肥格力</td>
+                                        <td>¥1,500,000</td>
+                                        <td>¥16,970</td>
+                                        <td>¥16,970</td>
+                                        <td>2023-03-15</td>
+                                        <td>30</td>
+                                        <td>
+                                            <span class="risk-badge medium">B级</span>
+                                            <button class="rating-detail-btn" data-rating="B">详情</button>
+                                        </td>
+                                        <td>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="rating-adjust-btn" data-customer-id="3" data-current-rating="B">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="risk-high" data-customer-id="4">
+                                        <td>南京格力</td>
+                                        <td>¥1,500,000</td>
+                                        <td>¥1,940</td>
+                                        <td>¥2,030</td>
+                                        <td>2023-02-28</td>
+                                        <td>30</td>
+                                        <td>
+                                            <span class="risk-badge high">C级</span>
+                                            <button class="rating-detail-btn" data-rating="C">详情</button>
+                                        </td>
+                                        <td>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="rating-adjust-btn" data-customer-id="4" data-current-rating="C">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="risk-extreme" data-customer-id="5">
+                                        <td>武汉美的</td>
+                                        <td>¥1,200,000</td>
+                                        <td>¥890,450</td>
+                                        <td>¥905,230</td>
+                                        <td>2023-01-15</td>
+                                        <td>45</td>
+                                        <td>
+                                            <span class="risk-badge extreme">D级</span>
+                                            <button class="rating-detail-btn" data-rating="D">详情</button>
+                                        </td>
+                                        <td>
+                                            <button class="btn-icon">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="rating-adjust-btn" data-customer-id="5" data-current-rating="D">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-footer">
+                            <div class="pagination">
+                                <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                                <button class="page-btn active">1</button>
+                                <button class="page-btn">2</button>
+                                <button class="page-btn">3</button>
+                                <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                            <div class="page-info">显示 1-10 条，共 42 条</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 在数据表格前添加以下额外的图表行 -->
+                <div class="dashboard-row">
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3 class="card-title">授信使用趋势</h3>
+                            <div class="card-actions">
+                                <select class="time-filter">
+                                    <option>按月</option>
+                                    <option>按季度</option>
+                                    <option>按年</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="creditUseChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3 class="card-title">回款率分析</h3>
+                            <div class="card-actions">
+                                <button class="btn-icon">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="payment-rate-chart">
+                                <canvas id="paymentRateChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 客户详情模态框 -->
+    <div class="modal" id="customerDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">客户详情</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="customer-info">
+                    <div class="info-section">
+                        <h3 class="section-title">基本信息</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">客户名称</div>
+                                <div class="info-value" id="detail-customer-name"></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">联系人</div>
+                                <div class="info-value" id="detail-contact-person"></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">联系电话</div>
+                                <div class="info-value" id="detail-contact-phone"></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">信用评级</div>
+                                <div class="info-value"><span class="risk-badge" id="detail-credit-rating"></span></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">月结天数</div>
+                                <div class="info-value" id="detail-payment-terms"></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">业务员</div>
+                                <div class="info-value" id="detail-salesperson"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3 class="section-title">授信情况</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">授信额度</div>
+                                <div class="info-value" id="detail-credit-limit"></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">已用额度</div>
+                                <div class="info-value" id="detail-used-credit"></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">应收账款</div>
+                                <div class="info-value" id="detail-receivable"></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">授信使用率</div>
+                                <div class="info-value" id="detail-credit-usage"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3 class="section-title">历史订单</h3>
+                        <table class="info-table">
+                            <thead>
+                                <tr>
+                                    <th>订单日期</th>
+                                    <th>交易类型</th>
+                                    <th>金额</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detail-orders">
+                                <!-- 订单数据将由JS动态生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="editCustomerBtn">编辑客户</button>
+                <button class="btn-secondary close-modal-btn">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 信用评级标准模态框 -->
+    <div class="modal" id="creditRatingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">信用评级标准</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="rating-tabs">
+                    <div class="rating-tab active" data-rating="A">A级（优质信用客户）</div>
+                    <div class="rating-tab" data-rating="B">B级（良好信用客户）</div>
+                    <div class="rating-tab" data-rating="C">C级（一般信用客户）</div>
+                    <div class="rating-tab" data-rating="D">D级（风险信用客户）</div>
+                </div>
+                
+                <div id="ratingContent">
+                    <!-- 评级内容将由JS动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 评级调整模态框 -->
+    <div class="modal" id="ratingAdjustModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">调整客户评级</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 内容将由JS动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 人工录入模态框 -->
+    <div class="modal" id="addCustomerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">添加新客户</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-customer-form">
+                    <div class="form-group">
+                        <label>客户名称 <span class="required">*</span></label>
+                        <input type="text" name="customerName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>联系人</label>
+                        <input type="text" name="contactPerson" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>联系电话</label>
+                        <input type="text" name="contactPhone" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>授信额度</label>
+                        <input type="number" name="creditLimit" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>月结天数</label>
+                        <input type="number" name="paymentTerms" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>初始信用评级</label>
+                        <select name="creditRating" class="form-control">
+                            <option value="A">A级</option>
+                            <option value="B">B级</option>
+                            <option value="C">C级</option>
+                            <option value="D">D级</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>业务员</label>
+                        <select name="salesperson" class="form-control">
+                            <option value="张经理">张经理</option>
+                            <option value="李经理">李经理</option>
+                            <option value="王经理">王经理</option>
+                            <option value="赵经理">赵经理</option>
+                            <option value="钱经理">钱经理</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">保存</button>
+                        <button type="button" class="btn-secondary close-modal-btn">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 风险预警模态框 -->
+    <div class="modal risk-modal" id="riskWarningModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-exclamation-triangle"></i> 风险预警通知</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="risk-alert-message">
+                    <strong>系统检测到以下需要您关注的风险事项，请及时处理：</strong>
+                </div>
+
+                <div class="risk-alert-section">
+                    <h3 class="section-title"><i class="fas fa-clock"></i> 待审核订单 (3)</h3>
+                    <table class="data-table compact">
+                        <thead>
+                            <tr>
+                                <th>客户名称</th>
+                                <th>订单号</th>
+                                <th>订单金额</th>
+                                <th>风险原因</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="risk-high">
+                                <td>武汉美的</td>
+                                <td>SO-20230415-001</td>
+                                <td>¥58,500</td>
+                                <td>客户D级信用，已有大额逾期</td>
+                                <td>
+                                    <button class="btn btn-secondary btn-sm">查看详情</button>
+                                    <button class="btn btn-primary btn-sm">审核订单</button>
+                                </td>
+                            </tr>
+                            <tr class="risk-high">
+                                <td>南京格力</td>
+                                <td>SO-20230415-008</td>
+                                <td>¥21,750</td>
+                                <td>客户C级信用，收款周期超45天</td>
+                                <td>
+                                    <button class="btn btn-secondary btn-sm">查看详情</button>
+                                    <button class="btn btn-primary btn-sm">审核订单</button>
+                                </td>
+                            </tr>
+                            <tr class="risk-medium">
+                                <td>合肥格力</td>
+                                <td>SO-20230415-012</td>
+                                <td>¥36,200</td>
+                                <td>信用额度即将耗尽</td>
+                                <td>
+                                    <button class="btn btn-secondary btn-sm">查看详情</button>
+                                    <button class="btn btn-primary btn-sm">审核订单</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="risk-alert-section">
+                    <h3 class="section-title"><i class="fas fa-ban"></i> 已拦截发货 (2)</h3>
+                    <table class="data-table compact">
+                        <thead>
+                            <tr>
+                                <th>客户名称</th>
+                                <th>订单号</th>
+                                <th>拦截原因</th>
+                                <th>拦截时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="risk-extreme">
+                                <td>苏州美的</td>
+                                <td>SO-20230401-003</td>
+                                <td>客户D级信用，逾期超90天</td>
+                                <td>2023-04-15 09:15</td>
+                                <td>
+                                    <button class="btn btn-secondary btn-sm">查看详情</button>
+                                    <button class="btn btn-primary btn-sm">特批放行</button>
+                                </td>
+                            </tr>
+                            <tr class="risk-high">
+                                <td>武汉美的</td>
+                                <td>SO-20230405-007</td>
+                                <td>客户D级信用，已有大额逾期</td>
+                                <td>2023-04-15 10:28</td>
+                                <td>
+                                    <button class="btn btn-secondary btn-sm">查看详情</button>
+                                    <button class="btn btn-primary btn-sm">特批放行</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="modal-footer" style="display: flex; justify-content: space-between; margin-top: 20px;">
+                    <button class="btn btn-secondary" id="viewAllRisksBtn">
+                        <i class="fas fa-list"></i> 查看全部风险
+                    </button>
+                    <button class="btn btn-primary" id="processAllRisksBtn">
+                        <i class="fas fa-tasks"></i> 批量处理
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="dashboard.js"></script>
+    <script src="credit-rating.js"></script>
+    <script src="customer-details.js"></script>
+</body>
+</html>
