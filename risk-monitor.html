@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>风险监控 - 客户信用管理系统</title>
+    <title>风险监控 - 客户风控链盾系统</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="credit-rating.css">
     <link rel="stylesheet" href="components.css">
+    <link rel="stylesheet" href="sidebar-nav.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         /* 风险监控页面特定样式 */
@@ -680,18 +681,34 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- 顶部导航 -->
-        <nav class="top-nav">
-            <div class="nav-brand">信用管理系统</div>
-            <div class="nav-items">
-                <a href="index.html" class="nav-item">仪表盘</a>
-                <a href="data-import.html" class="nav-item">数据导入</a>
-                <a href="customer-management.html" class="nav-item">客户管理</a>
-                <a href="risk-monitor.html" class="nav-item active">风险监控</a>
+        <!-- 左侧导航 -->
+        <nav class="sidebar-nav">
+            <div class="sidebar-header">
+                <div class="nav-brand">客户风控链盾系统</div>
             </div>
-            <div class="nav-profile">
-                <span class="user-name">管理员</span>
-                <div class="avatar">A</div>
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>综合仪表盘</span>
+                </a>
+                <a href="data-import.html" class="nav-item">
+                    <i class="fas fa-file-import"></i>
+                    <span>数据导入</span>
+                </a>
+                <a href="customer-management.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>客户管理</span>
+                </a>
+                <a href="risk-monitor.html" class="nav-item active">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>风险监控</span>
+                </a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="nav-profile">
+                    <div class="avatar">A</div>
+                    <span class="user-name">管理员</span>
+                </div>
             </div>
         </nav>
 
